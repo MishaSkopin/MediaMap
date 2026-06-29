@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карта Полтавської області</title>
+    
+    <!-- Стилі для карти -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        html, body, #map {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <!-- Скрипти для карти та читання KML -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/@mapbox/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
+
+    <script>
+        // Центруємо карту на Україну (масштаб 7)
+        const map = L.map('map').setView([49.0, 31.5], 7);
+
+        // Додаємо базову карту OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Завантажуємо твій KML файл
+        const kmlLayer = omnivore.kml('poltava.kml')
+            .on('ready', function() {
+                this.setStyle({
+                    color: '#1e88e5',    // Колір межі області
+                    weight: 3,           // Товщина лінії
+                    fillColor: '#bbdefb',// Колір заливки області
+                    fillOpacity: 0.2     // Прозорість заливки
+                });
+            })
+            .addTo(map);
+
+        // СПИСОК ТВОЇХ ТОЧОК
+        // Сюди додавай свої координати [широта, довгота], назви та описи
+        const locations = [
+            {
+                coords: [49.5883, 34.5514],
+                title: "Точка 1",
+                desc: "Твій короткий опис для першої точки."
+            },
+            {
+                coords: [49.0632, 33.4114],
+                title: "Точка 2",
+                desc: "Твій короткий опис для другої точки."
+            }
+        ];
+
+        // Автоматичне додавання точок на карту
+        locations.forEach(loc => {
+            const marker = L.marker(loc.coords).addTo(map);
+            const popupContent = `
+                <div style="font-family: Arial, sans-serif; min-width: 150px;">
+                    <h3 style="margin: 0 0 5px 0; color: #1565c0;">${loc.title}</h3>
+                    <p style="margin: 0; font-size: 14px; color: #333;">${loc.desc}</p>
+                </div>
+            `;
+            marker.bindPopup(popupContent);
+        });
+    </script>
+</body>
+</html>
