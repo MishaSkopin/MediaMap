@@ -236,244 +236,250 @@
             }
         }
 
-       // 4. ДАНІ, СТРУКТУРОВАНІ ЗА 4 РАЙОНАМИ (з твого коду)
-        const hierarchyData = [
+      // 4. ДАНІ, СТРУКТУРОВАНІ ЗА 4 РАЙОНАМИ (з твого коду)
+const hierarchyData = [
+    {
+        id: "poltavsky",
+        name: "Полтавський район",
+        cities: [
             {
-                id: "poltavsky",
-                name: "Полтавський район",
-                cities: [
-                   {
-                        id: "poltava",
-                        coords: [49.589871583757116, 34.55153736319904],
-                        title: "Полтава",
-                        desc: `<b>Телебачення:</b><br>
-                              • Суспільне Полтава (вул. Раїси Кириченко, 1 | редактор Карина Москаленко | 0994420836, <a href="mailto:news.poltava@suspilne.media">news.poltava@suspilne.media</a>)<br>
-                              • ІРТ-Полтава й Місто+ (м. Полтава, вул. Конституції, 4 | редактор Ігор Кужик | 0967317601, <a href="mailto:office@irt.pl.ua">office@irt.pl.ua</a>)<br>
-                              • PTV UA (вул. Пилипа Орлика, 20/1 | директор Інга Шкейда | 0630656507, <a href="mailto:poltavsketv@gmail.com">poltavsketv@gmail.com</a>)<br>
-                              • Ми-Полтава (вул. Юліана Матвійчука | директор Оксана Лєщина | 097914237)<br><br>
-                              <b>Радіо:</b><br>
-                              • Українське радіо. Лтава (м. Полтава, вул. Раїси Кириченко, 1 | керівник: Олександр Бобошко | 0662011271, <a href="mailto:press.poltava@suspilne.media">press.poltava@suspilne.media</a>)<br>
-                              • «Радіо Максимум» Полтава<br>
-                              • «Люкс фм» Полтава<br><br>
-                              <b>Друковані media:</b><br>
-                              • Газета «Вечірня Полтава» (Вул. Раїси Кириченко, 36 | редактор Володимир Марченко | 0507333777, <a href="mailto:mvp7@ukr.net">mvp7@ukr.net</a> | тираж 13170, щосереди)<br>
-                              • Газета «Полтавський вісник» (Вул. Європейська, 8 | 956909503, <a href="mailto:visnyk.poltava@gmail.com">visnyk.poltava@gmail.com</a> | тираж 1000, 1р/місяць)<br>
-                              • Газета «Зоря Полтавщини» (вул. Матвійчука, 115 | редактор Иріна Рогожинська | (0532)560525, <a href="mailto:zoryapolt@gmail.com">zoryapolt@gmail.com</a> | Наразі не друкуються)<br>
-                              • Газета «Село полтавське» (вул. Міщенка, 2 | редактор Лариса Коба | 0508629998, <a href="mailto:spmarketing@ukr.net">spmarketing@ukr.net</a> | тираж 9580, 1р/місяць)<br>
-                              • Газета «Вісті Img» (вул. Шевченка, 7 | редактор Юлія Шабля | 0532608413 | тираж 600, щоп’ятниці)<br><br>
-                              <b>Онлайн-медіа:</b><br>
-                              • ІВ «Новини Полтавщини» (вул. Соборності 45, кім. 517 | редактор Юрій Ніколаєв | 0501950749, <a href="mailto:np.pl.ua@gmail.com">np.pl.ua@gmail.com</a> | відвідуваність: 172 000)<br>
-                              • «Полтавщина» (вул. Юліана Матвійчука, 42 | редактор Ян Пругло | 0999367455, <a href="mailto:editor@poltava.pl.ua">editor@poltava.pl.ua</a> | відвідуваність: 1 278 000)<br>
-                              • «Полтавська хвиля» (вул. В.Чорновола, 19-А, офіс 3 | редактор: Віталій Улибін | 0660671520, <a href="mailto:info@poltavawave.com.ua">info@poltavawave.com.ua</a> | відвідуваність: 234 000)<br>
-                              • «Зміст» (вул. Соборності, 40 | редактор Анастасія Дорряк | 0502718025, <a href="mailto:zmist.pl@gmail.com">zmist.pl@gmail.com</a> | відвідуваність: 186 000)<br>
-                              • «Коло» (вул. Соборності, 50 | редактор Тетяна Цирульник | 0959171232, <a href="mailto:kolo.news.poltava@gmail.com">kolo.news.poltava@gmail.com</a> | відвідуваність: 133 000)<br>
-                              • «0532.ua» (вул. Соборності, 46, оф. 174 | редактор Юлія Голованова | 0665761517, <a href="mailto:editor.0532@gmail.com">editor.0532@gmail.com</a> | відвідуваність: 184 000)<br>
-                              • «Полтава 365» (вул. Котляревського, 22-Б | редактор Станіслав Майзус | 0675326292 | відвідуваність: 33 000)<br>
-                              • «Новини Полтавщини» (вул. Котляревського, 3 | <a href="mailto:office@poltava.cc">office@poltava.cc</a> | відвідуваність: 3 700)<br>
-                              • «Полтава 24» (вул. Старий Поділ, 4 | редактор Сергій Кравченко | 0532276334, <a href="mailto:ask@poltava24.com.ua">ask@poltava24.com.ua</a> | відвідуваність: 25 100)<br>
-                              • «Полтава today» (<a href="mailto:info@poltava.today">info@poltava.today</a> | відвідуваність: 4 400)<br><br>
-                              <b>Соціальні мережі:</b><br>
-                              • <a href="https://t.me/truexapoltava" target="_blank">Труха.Полтава</a> (295 540 підписників)<br>
-                              • <a href="https://t.me/region_poltava_syrena" target="_blank">ПОЛТАВА НОВИНИ | СИРЕНА</a> (197 600 підписників)<br>
-                              • <a href="https://t.me/ppo_energy_poltava" target="_blank">ППО - Energy Полтава</a> (125 880 підписників)<br>
-                              • <a href="https://t.me/poltava_pvp" target="_blank">PVP.POLTAVA / ПВП ПОЛТАВА</a> (105 734 підписників)<br>
-                              • <a href="https://t.me/poltava_tvoya" target="_blank">Твоя Полтава</a> (75 058 підписників)<br>
-                              • <a href="https://t.me/times_poltava" target="_blank">Полтава | Times</a> (73 660 підписників)<br>
-                              • <a href="https://t.me/poltava91" target="_blank">Моя Полтава</a> (58 790 підписників)<br>
-                              • <a href="https://t.me/suspilnepoltava" target="_blank">Суспільне Полтава</a> (56 480 підписників)<br>
-                              • <a href="https://t.me/poltava20" target="_blank">Полтава ІНФО | Новини Світло</a> (43 200 підписників)<br>
-                              • <a href="https://t.me/fontan1000000" target="_blank">Фонтанзамільйон Полтава</a> (23 572 підписників)<br>
-                              • <a href="https://t.me/poltava_insider" target="_blank">Полтава/ Новини</a> (23 190 підписників)<br>
-                              • <a href="https://t.me/v_plt" target="_blank">VPLT</a> (22 382 підписників)<br>
-                              • <a href="https://t.me/poltava_to" target="_blank">Полтавщина</a> (20 200 підписників)<br>
-                              • <a href="https://t.me/my_gotovi_poltava" target="_blank">Ми готові. Полтава</a> (16 730 підписників)<br>
-                              • <a href="https://t.me/huevajapoltava" target="_blank">Хуевая Полтава</a> (15 511 підписників)<br>
-                              • <a href="https://t.me/typical_poltava" target="_blank">Типова Полтащина</a> (15 191 підписників)<br>
-                              • <a href="https://t.me/polavamisto_irt" target="_blank">Полтава_Місто+ ІРТ</a> (11 114 підписників)<br>
-                              • <a href="https://t.me/my_poltava_news" target="_blank">Ми-Полтава</a> (10 300 підписників)<br>
-                              • <a href="https://t.me/StoyakKukobi" target="_blank">Стояк Кукоби</a> (8 737 підписників)<br>
-                              • <a href="https://t.me/pl_zmist" target="_blank">Зміст. Полтава</a> (7 797 підписників)<br>
-                              • <a href="https://t.me/polltava0532ua" target="_blank">Сайт міста Полтава 0532.ua</a> (6 621 підписник)<br>
-                              • <a href="https://t.me/Shlyapa_Poltava" target="_blank">Шляпа Полтавська</a> (4 556 підписників)<br>
-                              • <a href="https://t.me/traliknaognivku" target="_blank">Тралік на Огнівку</a> (3 406 підписників)<br>
-                              • <a href="https://t.me/Poltava_novunu" target="_blank">Доброго вечора, ми з Полтави</a> (2 963 підписників)<br>
-                              • <a href="https://t.me/poltavawave" target="_blank">Полтавська хвиля</a> (2 279 підписників)<br>
-                              • <a href="https://t.me/CommandantPoltava" target="_blank">Комендант Полтава</a> (1 093 підписники)`
-                    },
-                    {
-                        id: "opishnia",
-                        coords: [49.959015141844255, 34.603743384410215],
-                        title: "Опішня",
-                        desc: `<b>Радіо:</b><br>
-                              • Селищне радіомовлення «Голос Опішні» Опішня FM (вул. Перемоги, буд. 3 | керівник Яна Хайдурова | 0660406914)`
-                    },
-                    {
-                        id: "lanna",
-                        coords: [49.35031203911503, 35.258109326278785],
-                        title: "Ланна",
-                        desc: `<b>Друковані медіа:</b><br>
-                              • Газета «Моя громада+» (вул. Миру, 5 | редактор Глуховеря І.П. | тираж 10000, 1/місяць)`
-                    },
-                    {
-                        id: "kotelva",
-                        coords: [50.06871697970275, 34.76480293991771],
-                        title: "Котельва",
-                        desc: `<b>Друковане media:</b><br>
-                              • Котелевська районна газета «Народна трибуна» (вул. Полтавський Шлях, б. 221 | редактор Ірина Шило | 0955052618 | Тираж 1567, 1/місяць)<br><br>
-                              <b>Радіо:</b><br>
-                              • Вільне радіо Котельва (вул. Полтавський шлях, 207 | керівник Віталій Кривобік)`
-                    },
-                    {
-                        id: "reshetylivka",
-                        coords: [49.56440548086894, 34.07979173037247],
-                        title: "Решетилівка",
-                        desc: `<b>Друковані медіа:</b><br>
-                              • Решетилівський вісник (вул. Шевченка, 4 | 066 332 91 04, <a href="mailto:resvisnik@gmail.com">resvisnik@gmail.com</a> | редактор Циган Іван Іванович)<br><br>
-                              <b>Онлайн-медіа:</b><br>
-                              • Решетилівщина (вул. Покровська, 16 | <a href="https://resh.news/" target="_blank">https://resh.news/</a> | <a href="mailto:ads@relife.media">ads@relife.media</a> | 4300 відвідувань)<br><br>
-                              <b>Радіо:</b><br>
-                              • Релайф (вул. Шевченка, 4 | 0990110911, 0509760542, <a href="mailto:radio_reshet@ukr.net">radio_reshet@ukr.net</a> | редактор Ігор Петраков)`
-                    },
-                    {
-                        id: "rozsoshentsi",
-                        coords: [49.5403906136859, 34.504261676751234],
-                        title: "Розсошенці",
-                        desc: `<b>Друковане media:</b><br>
-                              • Обласна газета «Полтавська думка» (вул. Перспективна, 1 | редактор Діана Страшко | 066 589 44 97)`
-                    },
-                    {
-                        id: "chutove",
-                        coords: [49.71139305002166, 35.15749682875592],
-                        title: "Чутове",
-                        desc: `<b>Друковані медіа:</b><br>
-                              • Газета «Сільські новини» (площа Перемоги, 2 | Редактор Оксана Черкас, +380665887345, <a href="mailto:silsnow@ukr.net">silsnow@ukr.net</a> | Тираж 2000, 2 рази на місяць)<br><br>
-                              <b>Соціальні мережі:</b><br>
-                              • <a href="https://www.facebook.com/chutivskiykray/?locale=uk_UA" target="_blank">«Чутівський край»</a> (11000 підписників)`
-                    },
-                    {
-                        id: "kobeliaky",
-                        coords: [49.151277227456056, 34.19500079757286],
-                        title: "Кобеляки",
-                        desc: `<b>Онлайн-медіа:</b><br>
-                              • «Тижневик ЕХО» (вул. Михайлівська, 51. | редакція: 0979039267, <a href="mailto:gazeta-exo@i.ua">gazeta-exo@i.ua</a> | відвідуваність: 29 000)`
-                    },
-                    {
-                        id: "zinkiv",
-                        coords: [50.2044126263834, 34.363366514276656],
-                        title: "Зіньків",
-                        desc: `<b>Радіо:</b><br>
-                              • Комунальна установа «Редакція радіо «Вишня ФМ» Зіньківської міської ради (вул. Воздвиженська, 40 | директор Людмила Негода)`
-                    }
-                ]
+                id: "poltava",
+                coords: [49.589871583757116, 34.55153736319904],
+                title: "Полтава",
+                desc: `<b>Телебачення:</b><br>
+                      • Суспільне Полтава (вул. Раїси Кириченко, 1 | редактор Карина Москаленко | <a href="tel:+380994420836">0994420836</a>, <a href="mailto:news.poltava@suspilne.media">news.poltava@suspilne.media</a>)<br>
+                      • ІРТ-Полтава й Місто+ (м. Полтава, вул. Конституції, 4 | редактор Ігор Кужик | <a href="tel:+380967317601">0967317601</a>, <a href="mailto:office@irt.pl.ua">office@irt.pl.ua</a>)<br>
+                      • PTV UA (вул. Пилипа Орлика, 20/1 | директор Інга Шкейда | <a href="tel:+380630656507">0630656507</a>, <a href="mailto:poltavsketv@gmail.com">poltavsketv@gmail.com</a>)<br>
+                      • Ми-Полтава (вул. Юліана Матвійчука | директор Оксана Лєщина | <a href="tel:+380979142370">097914237</a>)<br><br>
+                      <b>Радіо:</b><br>
+                      • Українське радіо. Лтава (м. Полтава, вул. Раїси Кириченко, 1 | керівник: Олександр Бобошко | <a href="tel:+380662011271">0662011271</a>, <a href="mailto:press.poltava@suspilne.media">press.poltava@suspilne.media</a>)<br>
+                      • «Радіо Максимум» Полтава<br>
+                      • «Люкс фм» Полтава<br><br>
+                      <b>Друковані media:</b><br>
+                      • Газета «Вечірня Полтава» (Вул. Раїси Кириченко, 36 | редактор Володимир Марченко | <a href="tel:+380507333777">0507333777</a>, <a href="mailto:mvp7@ukr.net">mvp7@ukr.net</a> | тираж 13170, щосереди)<br>
+                      • Газета «Полтавський вісник» (Вул. Європейська, 8 | <a href="tel:+380956909503">956909503</a>, <a href="mailto:visnyk.poltava@gmail.com">visnyk.poltava@gmail.com</a> | тираж 1000, 1р/місяць)<br>
+                      • Газета «Зоря Полтавщини» (вул. Матвійчука, 115 | редактор Иріна Рогожинська | <a href="tel:+380532560525">(0532)560525</a>, <a href="mailto:zoryapolt@gmail.com">zoryapolt@gmail.com</a> | Наразі не друкуються)<br>
+                      • Газета «Село полтавське» (вул. Міщенка, 2 | редактор Лариса Коба | <a href="tel:+380508629998">0508629998</a>, <a href="mailto:spmarketing@ukr.net">spmarketing@ukr.net</a> | тираж 9580, 1р/місяць)<br>
+                      • Газета «Вісті Img» (вул. Шевченка, 7 | редактор Юлія Шабля | <a href="tel:+380532608413">0532608413</a> | тираж 600, щоп’ятниці)<br><br>
+                      <b>Онлайн-медіа:</b><br>
+                      • ІВ «Новини Полтавщини» (вул. Соборності 45, кім. 517 | редактор Юрій Ніколаєв | <a href="tel:+380501950749">0501950749</a>, <a href="mailto:np.pl.ua@gmail.com">np.pl.ua@gmail.com</a> | відвідуваність: 172 000)<br>
+                      • «Полтавщина» (вул. Юліана Матвійчука, 42 | редактор Ян Пругло | <a href="tel:+380999367455">0999367455</a>, <a href="mailto:editor@poltava.pl.ua">editor@poltava.pl.ua</a> | відвідуваність: 1 278 000)<br>
+                      • «Полтавська хвиля» (вул. В.Чорновола, 19-А, офіс 3 | редактор: Віталій Улибін | <a href="tel:+380660671520">0660671520</a>, <a href="mailto:info@poltavawave.com.ua">info@poltavawave.com.ua</a> | відвідуваність: 234 000)<br>
+                      • «Зміст» (вул. Соборності, 40 | редактор Anastasiia Dorriak | <a href="tel:+380502718025">0502718025</a>, <a href="mailto:zmist.pl@gmail.com">zmist.pl@gmail.com</a> | відвідуваність: 186 000)<br>
+                      • «Коло» (вул. Соборності, 50 | редактор Тетяна Цирульник | <a href="tel:+380959171232">0959171232</a>, <a href="mailto:kolo.news.poltava@gmail.com">kolo.news.poltava@gmail.com</a> | відвідуваність: 133 000)<br>
+                      • «0532.ua» (вул. Соборності, 46, оф. 174 | редактор Юлія Голованова | <a href="tel:+380665761517">0665761517</a>, <a href="mailto:editor.0532@gmail.com">editor.0532@gmail.com</a> | відвідуваність: 184 000)<br>
+                      • «Полтава 365» (вул. Котляревського, 22-Б | редактор Станіслав Майзус | <a href="tel:+380675326292">0675326292</a> | відвідуваність: 33 000)<br>
+                      • «Новини Полтавщини» (вул. Котляревського, 3 | <a href="mailto:office@poltava.cc">office@poltava.cc</a> | відвідуваність: 3 700)<br>
+                      • «Полтава 24» (вул. Старий Поділ, 4 | редактор Сергій Кравченко | <a href="tel:+380532276334">0532276334</a>, <a href="mailto:ask@poltava24.com.ua">ask@poltava24.com.ua</a> | відвідуваність: 25 100)<br>
+                      • «Полтава today» (<a href="mailto:info@poltava.today">info@poltava.today</a> | відвідуваність: 4 400)<br><br>
+                      <b>Соціальні мережі:</b><br>
+                      • <a href="https://t.me/truexapoltava" target="_blank">Труха.Полтава</a> (295 540 підписників)<br>
+                      • <a href="https://t.me/region_poltava_syrena" target="_blank">ПОЛТАВА НОВИНИ | СИРЕНА</a> (197 600 підписників)<br>
+                      • <a href="https://t.me/ppo_energy_poltava" target="_blank">ППО - Energy Полтава</a> (125 880 підписників)<br>
+                      • <a href="https://t.me/poltava_pvp" target="_blank">PVP.POLTAVA / ПВП ПОЛТАВА</a> (105 734 підписників)<br>
+                      • <a href="https://t.me/poltava_tvoya" target="_blank">Твоя Полтава</a> (75 058 підписників)<br>
+                      • <a href="https://t.me/times_poltava" target="_blank">Полтава | Times</a> (73 660 підписників)<br>
+                      • <a href="https://t.me/poltava91" target="_blank">Моя Полтава</a> (58 790 підписників)<br>
+                      • <a href="https://t.me/suspilnepoltava" target="_blank">Суспільне Полтава</a> (56 480 підписників)<br>
+                      • <a href="https://t.me/poltava20" target="_blank">Полтава ІНФО | Новини Світло</a> (43 200 підписників)<br>
+                      • <a href="https://t.me/fontan1000000" target="_blank">Фонтанзамільйон Полтава</a> (23 572 підписників)<br>
+                      • <a href="https://t.me/poltava_insider" target="_blank">Полтава/ Новини</a> (23 190 підписників)<br>
+                      • <a href="https://t.me/v_plt" target="_blank">VPLT</a> (22 382 підписників)<br>
+                      • <a href="https://t.me/poltava_to" target="_blank">Полтавщина</a> (20 200 підписників)<br>
+                      • <a href="https://t.me/my_gotovi_poltava" target="_blank">Ми готові. Полтава</a> (16 730 підписників)<br>
+                      • <a href="https://t.me/huevajapoltava" target="_blank">Хуевая Полтава</a> (15 511 підписників)<br>
+                      • <a href="https://t.me/typical_poltava" target="_blank">Типова Полтащина</a> (15 191 підписників)<br>
+                      • <a href="https://t.me/polavamisto_irt" target="_blank">Полтава_Місто+ ІРТ</a> (11 114 підписників)<br>
+                      • <a href="https://t.me/my_poltava_news" target="_blank">Ми-Полтава</a> (10 300 підписників)<br>
+                      • <a href="https://t.me/StoyakKukobi" target="_blank">Стояк Кукоби</a> (8 737 підписників)<br>
+                      • <a href="https://t.me/pl_zmist" target="_blank">Зміст. Полтава</a> (7 797 підписників)<br>
+                      • <a href="https://t.me/polltava0532ua" target="_blank">Сайт міста Полтава 0532.ua</a> (6 621 підписник)<br>
+                      • <a href="https://t.me/Shlyapa_Poltava" target="_blank">Шляпа Полтавська</a> (4 556 підписників)<br>
+                      • <a href="https://t.me/traliknaognivku" target="_blank">Тралік на Огнівку</a> (3 406 підписників)<br>
+                      • <a href="https://t.me/Poltava_novunu" target="_blank">Доброго вечора, ми з Полтави</a> (2 963 підписників)<br>
+                      • <a href="https://t.me/poltavawave" target="_blank">Полтавська хвиля</a> (2 279 підписників)<br>
+                      • <a href="https://t.me/CommandantPoltava" target="_blank">Комендант Полтава</a> (1 093 підписники)`
             },
             {
-                id: "lubensky",
-                name: "Лубенський район",
-                cities: [
-                    {
-                        id: "khorol",
-                        coords: [49.781980660838684, 33.27406690711789],
-                        title: "Хорол",
-                        desc: `<b>Друковані медіа:</b><br>
-                              • Вісті Хорольщини (вул. Незалежності, буд. 65/20, приміщення 1 | 095 068-56-29, <a href="mailto:horol_visti@ukr.net">horol_visti@ukr.net</a> | редактор Наталія Ватуля | тираж 8500, щоп’ятниці)`
-                    },
-                    {
-                        id: "pyriatyn",
-                        coords: [50.23971543366116, 32.50720593066764],
-                        title: "Пирятин",
-                        desc: `<b>Друковані media:</b><br>
-                              • Газета «Пирятинські вісті» (вулиця Успенська, 5 | Редактор – Оксана Іванівна Бондаренко, <a href="mailto:pirvisti@ukr.net">pirvisti@ukr.net</a> | (05358) 2-06-73, (099) 455-67-20 | Тираж 1260, щовівторка)`
-                    },
-                    {
-                        id: "lubny",
-                        coords: [50.01647239048797, 33.000682139961796],
-                        title: "Лубни",
-                        desc: `<b>Друковані медіа:</b><br>
-                              • Вісник (вул. Ярослава Мудрого, буд. 31 | (05361) 74-333 | редактор Людмила Бірюкова | тираж 700, щосереди)<br><br>
-                              <b>Онлайн-медіа:</b><br>
-                              • Moзambik.media (<a href="https://mo3ambik.media/" target="_blank">https://mo3ambik.media/</a> | відвідуваність 2200)`
-                    },
-                    {
-                        id: "hrebinka",
-                        coords: [50.1184759876677, 32.45232241478251],
-                        title: "Гребінка",
-                        desc: `<b>Онлайн-медіа:</b><br>
-                              • Гребінка (<a href="https://www.grebenka.com/" target="_blank">https://www.grebenka.com/</a> | (066) 372-49-57, <a href="mailto:admin@grebenka.com">admin@grebenka.com</a> | Відвідуваність 100000)`
-                    }
-                ]
+                id: "opishnia",
+                coords: [49.959015141844255, 34.603743384410215],
+                title: "Опішня",
+                desc: `<b>Радіо:</b><br>
+                      • Селищне радіомовлення «Голос Опішні» Опішня FM (вул. Перемоги, буд. 3 | керівник Яна Хайдурова | <a href="tel:+380660406914">0660406914</a>)`
             },
             {
-                id: "kremenchutsky",
-                name: "Кременчуцький район",
-                cities: [
-                    {
-                        id: "kremenchuk",
-                        coords: [49.06925571811738, 33.426795339807455],
-                        title: "Кременчук",
-                        desc: `<b>Телебачення:</b><br>
-                              • Візит (бульвар Українського відродження, 8 | редактор Ганна Плаксій | 0677966215, <a href="mailto:office@office.vizit-net.com">office@office.vizit-net.com</a>)<br>
-                              • Кременчуцька міська ТРК (вул. Генерала Жадова, 12 | редактор Сергій Перепелятник | 0960374981, <a href="mailto:kremenchugnovosti@gmail.com">kremenchugnovosti@gmail.com</a>)<br><br>
-                              <b>Радіо:</b><br>
-                              • «Люкс фм» Кременчук (вул. Керченська, 37)<br><br>
-                              <b>Друковані медіа:</b><br>
-                              • Газета «Для дому і сім’ї» (Шевченко, 50а | редактор Мирослава Українська | 0507574356, <a href="mailto:gazetakremenchuk@gmail.com">gazetakremenchuk@gmail.com</a> | тираж 8 500, щочетверга)<br><br>
-                              <b>Онлайн-медіа:</b><br>
-                              • Кременчуцький ТелеграфЪ + друк. (вул. Шевченка, 50-А | редактор Леся Лазоренко | 0686404448, <a href="mailto:telegraf.in.ua@gmail.com">telegraf.in.ua@gmail.com</a> | Відвідуваність: 468 000)<br>
-                              • Кременчуцька газета + друк. (вул. Старшого лейтенанта Кагала, 45 | редактор Олег Булашев | 0675308797, <a href="mailto:advkgua@gmail.com">advkgua@gmail.com</a> | відвідуваність: 469 000)<br>
-                              • «Кременчуг тудей» (редактор Василь Сердюк (псевдонім) | <a href="mailto:info@kremen.today">info@kremen.today</a> | відвідуваність: 169 000)<br><br>
-                              <b>Соціальні мережі:</b><br>
-                              • <a href="https://t.me/h_kremenchug" target="_blank">Х Кременчук</a> (136 838 підписників)<br>
-                              • <a href="https://t.me/ok_kremen" target="_blank">ОК Кременчук</a> (21 340)`
-                    },
-                    {
-                        id: "horishnie_plavni",
-                        coords: [49.0156550992913, 33.6408459203986],
-                        title: "Горішні Плавні",
-                        desc: `<b>Телебачення:</b><br>
-                              • Телерадіокомпанія ГОК (просп. Героїв Дніпра, 54 | керівник Володимир Богодист | 0663058309, <a href="mailto:office@trkgok.pl.ua">office@trkgok.pl.ua</a>)<br><br>
-                              <b>Радіо:</b><br>
-                              • «Кварцит» (вул. Миру, 24 | директор Тетяна Терен | 0675326914, <a href="mailto:radio.kvartsit@gmail.com">radio.kvartsit@gmail.com</a>)<br><br>
-                              <b>Друковані media:</b><br>
-                              • «Хроніки тижня» (просп. Героїв Дніпра, 54 | 0730747963, <a href="mailto:xweek.info@gmail.com">xweek.info@gmail.com</a> | тираж 5 000, щосереди)<br><br>
-                              <b>Соціальні мережі:</b><br>
-                              • <a href="https://t.me/gorishnie_plavni1" target="_blank">Горішні Плавні</a> (20 719)<br>
-                              • <a href="https://t.me/telekanalGOK" target="_blank">Телеканал ГОК</a> (2 890 підписників)`
-                    }
-                ]
+                id: "lanna",
+                coords: [49.35031203911503, 35.258109326278785],
+                title: "Ланна",
+                desc: `<b>Друковані медіа:</b><br>
+                      • Газета «Моя громада+» (вул. Миру, 5 | редактор Глуховеря І.П. | тираж 10000, 1/місяць)`
             },
             {
-                id: "myrhorodsky",
-                name: "Миргородський район",
-                cities: [
-                   {
-                        id: "hadiach",
-                        coords: [50.368233749095715, 33.98000552306202],
-                        title: "Гадяч",
-                        desc: `<b>Друковані видання:</b><br>
-                              • Газета Базар Медіа в Україні (вул. Гетьманська, 62-Б | 0508011885, <a href="mailto:bazarmedia@ukr.net">bazarmedia@ukr.net</a> | засновник і видавець Товстий Олександр | тираж 1000, щочетверга)<br><br>
-                              <b>Соціальні мережі:</b><br>
-                              • <a href="https://t.me/Hadiach_telegram" target="_blank">Гадяч</a> (12 217 підписників)<br>
-                              • <a href="https://t.me/hadiach_city" target="_blank">Гадяч.City</a> (1 000 підписників)`
-                    },
-                    {
-                        id: "myrhorod",
-                        coords: [49.96273588416958, 33.607501694968086],
-                        title: "Миргород",
-                        desc: `<b>Телебачення:</b><br>
-                              • Міська телестудія «Миргород» (вул. Незалежності, 2 | Ошека Євген Павлович, 0505684696 | <a href="mailto:mirgorod_tv@ukr.net">mirgorod_tv@ukr.net</a>)<br><br>
-                              <b>Друковані медіа:</b><br>
-                              • Газета «Прапор Перемоги» (м. Миргород, вул. Кашинского, 21 | головний редактор Устименко Ольга Олександрівна | +380 99 408 1814 | Тираж 2200, 2 рази на місяць)`
-                    },
-                    {
-                        id: "velyka_bahachka",
-                        coords: [49.78925313280651, 33.72845014823058],
-                        title: "Велика Багачка",
-                        desc: `<b>Друковані медіа:</b><br>
-                              • Газета «Рідний край» (вул. Шевченка, 73 | Головний редактор О.Прогрущенко | e-mail: <a href="mailto:gazetagbag@ukr.net">gazetagbag@ukr.net</a> | Тираж 610, 2/місяць)`
-                    }
-                ]
+                id: "kotelva",
+                coords: [50.06871697970275, 34.76480293991771],
+                title: "Котельва",
+                desc: `<b>Друковане media:</b><br>
+                      • Котелевська районна газета «Народна трибуна» (вул. Полтавський Шлях, б. 221 | редактор Ірина Шило | <a href="tel:+380955052618">0955052618</a> | Тираж 1567, 1/місяць)<br><br>
+                      <b>Радіо:</b><br>
+                      • Вільне радіо Котельва (вул. Полтавський шлях, 207 | керівник Віталій Кривобік)`
+            },
+            {
+                id: "reshetylivka",
+                coords: [49.56440548086894, 34.07979173037247],
+                title: "Решетилівка",
+                desc: `<b>Друковані медіа:</b><br>
+                      • Решетилівський вісник (вул. Шевченка, 4 | <a href="tel:+380663329104">066 332 91 04</a>, <a href="mailto:resvisnik@gmail.com">resvisnik@gmail.com</a> | редактор Циган Іван Іванович)<br><br>
+                      <b>Онлайн-медіа:</b><br>
+                      • Решетилівщина (вул. Покровська, 16 | <a href="https://resh.news/" target="_blank">https://resh.news/</a> | <a href="mailto:ads@relife.media">ads@relife.media</a> | 4300 відвідувань)<br><br>
+                      <b>Радіо:</b><br>
+                      • Релайф (вул. Шевченка, 4 | <a href="tel:+380990110911">0990110911</a>, <a href="tel:+380509760542">0509760542</a>, <a href="mailto:radio_reshet@ukr.net">radio_reshet@ukr.net</a> | редактор Ігор Петраков)`
+            },
+            {
+                id: "rozsoshentsi",
+                coords: [49.5403906136859, 34.504261676751234],
+                title: "Розсошенці",
+                desc: `<b>Друковане media:</b><br>
+                      • Обласна газета «Полтавська думка» (вул. Перспективна, 1 | редактор Діана Страшко | <a href="tel:+380665894497">066 589 44 97</a>)`
+            },
+            {
+                id: "chutove",
+                coords: [49.71139305002166, 35.15749682875592],
+                title: "Чутове",
+                desc: `<b>Друковані медіа:</b><br>
+                      • Газета «Сільські новини» (площа Перемоги, 2 | Редактор Оксана Черкас, <a href="tel:+380665887345">+380665887345</a>, <a href="mailto:silsnow@ukr.net">silsnow@ukr.net</a> | Тираж 2000, 2 рази на місяць)<br><br>
+                      <b>Соціальні мережі:</b><br>
+                      • <a href="https://www.facebook.com/chutivskiykray/?locale=uk_UA" target="_blank">«Чутівський край»</a> (11000 підписників)`
+            },
+            {
+                id: "kobeliaky",
+                coords: [49.151277227456056, 34.19500079757286],
+                title: "Кобеляки",
+                desc: `<b>Онлайн-медіа:</b><br>
+                      • «Тижневик ЕХО» (вул. Михайлівська, 51. | редакція: <a href="tel:+380979039267">0979039267</a>, <a href="mailto:gazeta-exo@i.ua">gazeta-exo@i.ua</a> | відвідуваність: 29 000)`
+            },
+            {
+                id: "zinkiv",
+                coords: [50.2044126263834, 34.363366514276656],
+                title: "Зіньків",
+                desc: `<b>Радіо:</b><br>
+                      • Комунальна установа «Редакція радіо «Вишня ФМ» Зіньківської міської ради (вул. Воздвиженська, 40 | директор Людмила Негода)`
             }
-        ];
+        ]
+    },
+    {
+        id: "lubensky",
+        name: "Лубенський район",
+        cities: [
+            {
+                id: "khorol",
+                coords: [49.781980660838684, 33.27406690711789],
+                title: "Хорол",
+                desc: `<b>Друковані медіа:</b><br>
+                      • Вісті Хорольщини (вул. Незалежності, буд. 65/20, приміщення 1 | <a href="tel:+380950685629">095 068-56-29</a>, <a href="mailto:horol_visti@ukr.net">horol_visti@ukr.net</a> | редактор Наталія Ватуля | тираж 8500, щоп’ятниці)`
+            },
+            {
+                id: "pyriatyn",
+                coords: [50.23971543366116, 32.50720593066764],
+                title: "Пирятин",
+                desc: `<b>Друковані media:</b><br>
+                      • Газета «Пирятинські вісті» (вулиця Успенська, 5 | Редактор – Оксана Іванівна Бондаренко, <a href="mailto:pirvisti@ukr.net">pirvisti@ukr.net</a> | <a href="tel:+380535820673">(05358) 2-06-73</a>, <a href="tel:+380994556720">(099) 455-67-20</a> | Тираж 1260, щовівторка)`
+            },
+           {
+                id: "lubny",
+                coords: [50.01647239048797, 33.000682139961796],
+                title: "Лубни",
+                desc: `<b>Друковані медіа:</b><br>
+                      • Вісник (вул. Ярослава Мудрого, буд. 31 | <a href="tel:+380536174333">(05361) 74-333</a> | редактор Людмила Бірюкова | тираж 700, щосереди)<br><br>
+                      <b>Онлайн-медіа:</b><br>
+                      • Moзambik.media (<a href="https://mo3ambik.media/" target="_blank">https://mo3ambik.media/</a> | відвідуваність 2200)<br><br>
+                      <b>Соціальні мережі:</b><br>
+                      • <a href="https://t.me/mo3ambik" target="_blank">МОЗАМБІК.МЕДІА: Лубни, Пирятин, Хорол, Гребінка, Оржиця</a> (34 396 підписників)<br>
+                      • <a href="https://t.me/moilubny" target="_blank">Мої Лубни НОВИНИ</a> (11 116 підписників)<br>
+                      • <a href="https://t.me/lybnygde" target="_blank">Лубни ЩДК?</a> (6 440 підписників)<br>
+                      • <a href="https://t.me/lybnusvitlo" target="_blank">Лубни Тутешні | Світло</a> (4 909 підписників)<br>
+                      • <a href="https://t.me/lubny_ua" target="_blank">Х Лубни.</a> (4 095 підписників)`
+            },
+            {
+                id: "hrebinka",
+                coords: [50.1184759876677, 32.45232241478251],
+                title: "Гребінка",
+                desc: `<b>Онлайн-медіа:</b><br>
+                      • Гребінка (<a href="https://www.grebenka.com/" target="_blank">https://www.grebenka.com/</a> | <a href="tel:+380663724957">(066) 372-49-57</a>, <a href="mailto:admin@grebenka.com">admin@grebenka.com</a> | Відвідуваність 100000)`
+            }
+        ]
+    },
+    {
+        id: "kremenchutsky",
+        name: "Кременчуцький район",
+        cities: [
+            {
+                id: "kremenchuk",
+                coords: [49.06925571811738, 33.426795339807455],
+                title: "Кременчук",
+                desc: `<b>Телебачення:</b><br>
+                      • Візит (бульвар Українського відродження, 8 | редактор Ганна Плаксій | <a href="tel:+380677966215">0677966215</a>, <a href="mailto:office@office.vizit-net.com">office@office.vizit-net.com</a>)<br>
+                      • Кременчуцька міська ТРК (вул. Генерала Жадова, 12 | редактор Сергій Перепелятник | <a href="tel:+380960374981">0960374981</a>, <a href="mailto:kremenchugnovosti@gmail.com">kremenchugnovosti@gmail.com</a>)<br><br>
+                      <b>Радіо:</b><br>
+                      • «Люкс фм» Кременчук (вул. Керченська, 37)<br><br>
+                      <b>Друковані медіа:</b><br>
+                      • Газета «Для дому і сім’ї» (Шевченко, 50а | редактор Мирослава Українська | <a href="tel:+380507574356">0507574356</a>, <a href="mailto:gazetakremenchuk@gmail.com">gazetakremenchuk@gmail.com</a> | тираж 8 500, щочетверга)<br><br>
+                      <b>Онлайн-медіа:</b><br>
+                      • Кременчуцький ТелеграфЪ + друк. (вул. Шевченка, 50-A | редактор Леся Лазоренко | <a href="tel:+380686404448">0686404448</a>, <a href="mailto:telegraf.in.ua@gmail.com">telegraf.in.ua@gmail.com</a> | Відвідуваність: 468 000)<br>
+                      • Кременчуцька газета + друк. (вул. Старшого лейтенанта Кагала, 45 | editor Олег Булашев | <a href="tel:+380675308797">0675308797</a>, <a href="mailto:advkgua@gmail.com">advkgua@gmail.com</a> | відвідуваність: 469 000)<br>
+                      • «Кременчуг тудей» (редактор Василь Сердюк (псевдонім) | <a href="mailto:info@kremen.today">info@kremen.today</a> | відвідуваність: 169 000)<br><br>
+                      <b>Соціальні мережі:</b><br>
+                      • <a href="https://t.me/h_kremenchug" target="_blank">Х Кременчук</a> (136 838 підписників)<br>
+                      • <a href="https://t.me/ok_kremen" target="_blank">ОК Кременчук</a> (21 340)`
+            },
+            {
+                id: "horishnie_plavni",
+                coords: [49.0156550992913, 33.6408459203986],
+                title: "Горішні Плавні",
+                desc: `<b>Телебачення:</b><br>
+                      • Телерадіокомпанія ГОК (просп. Героїв Дніпра, 54 | керівник Володимир Богодист | <a href="tel:+380663058309">0663058309</a>, <a href="mailto:office@trkgok.pl.ua">office@trkgok.pl.ua</a>)<br><br>
+                      <b>Радіо:</b><br>
+                      • «Кварцит» (вул. Миру, 24 | директор Тетяна Терен | <a href="tel:+380675326914">0675326914</a>, <a href="mailto:radio.kvartsit@gmail.com">radio.kvartsit@gmail.com</a>)<br><br>
+                      <b>Друковані media:</b><br>
+                      • «Хроніки тижня» (просп. Героїв Дніпра, 54 | <a href="tel:+380730747963">0730747963</a>, <a href="mailto:xweek.info@gmail.com">xweek.info@gmail.com</a> | тираж 5 000, щосереди)<br><br>
+                      <b>Соціальні мережі:</b><br>
+                      • <a href="https://t.me/gorishnie_plavni1" target="_blank">Горішні Плавні</a> (20 719)<br>
+                      • <a href="https://t.me/telekanalGOK" target="_blank">Телеканал ГОК</a> (2 890 підписників)`
+            }
+        ]
+    },
+    {
+        id: "myrhorodsky",
+        name: "Миргородський район",
+        cities: [
+            {
+                id: "hadiach",
+                coords: [50.368233749095715, 33.98000552306202],
+                title: "Гадяч",
+                desc: `<b>Друковані видання:</b><br>
+                      • Газета Базар Медіа в Україні (вул. Гетьманська, 62-Б | <a href="tel:+380508011885">0508011885</a>, <a href="mailto:bazarmedia@ukr.net">bazarmedia@ukr.net</a> | засновник і видавець Товстий Олександр | тираж 1000, щочетверга)<br><br>
+                      <b>Соціальні мережі:</b><br>
+                      • <a href="https://t.me/Hadiach_telegram" target="_blank">Гадяч</a> (12 217 підписників)<br>
+                      • <a href="https://t.me/hadiach_city" target="_blank">Гадяч.City</a> (1 000 підписників)`
+            },
+            {
+                id: "myrhorod",
+                coords: [49.96273588416958, 33.607501694968086],
+                title: "Миргород",
+                desc: `<b>Телебачення:</b><br>
+                      • Міська телестудія «Миргород» (вул. Незалежності, 2 | Ошека Євген Павлович, <a href="tel:+380505684696">0505684696</a> | <a href="mailto:mirgorod_tv@ukr.net">mirgorod_tv@ukr.net</a>)<br><br>
+                      <b>Друковані медіа:</b><br>
+                      • Газета «Прапор Перемоги» (м. Миргород, вул. Кашинского, 21 | головний редактор Устименко Ольга Олександрівна | <a href="tel:+380994081814">+380 99 408 1814</a> | Тираж 2200, 2 рази на місяць)`
+            },
+            {
+                id: "velyka_bahachka",
+                coords: [49.78925313280651, 33.72845014823058],
+                title: "Велика Багачка",
+                desc: `<b>Друковані медіа:</b><br>
+                      • Газета «Рідний край» (вул. Шевченка, 73 | Головний редактор О.Прогрущенко | e-mail: <a href="mailto:gazetagbag@ukr.net">gazetagbag@ukr.net</a> | Тираж 610, 2/місяць)`
+            }
+        ]
+    }
+];
 
         const districtsRoot = document.getElementById('districts-root');
 
