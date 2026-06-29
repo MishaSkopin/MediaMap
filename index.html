@@ -236,7 +236,7 @@
             }
         }
 
-        // 4. ДАНІ, СТРУКТУРОВАНІ ЗА 4 РАЙОНАМИ (з твого коду)
+       // 4. ДАНІ, СТРУКТУРОВАНІ ЗА 4 РАЙОНАМИ (з твого коду)
         const hierarchyData = [
             {
                 id: "poltavsky",
@@ -260,7 +260,7 @@
                               • Газета «Полтавський вісник» (Вул. Європейська, 8 | 956909503, <a href="mailto:visnyk.poltava@gmail.com">visnyk.poltava@gmail.com</a> | тираж 1000, 1р/місяць)<br>
                               • Газета «Зоря Полтавщини» (вул. Матвійчука, 115 | редактор Иріна Рогожинська | (0532)560525, <a href="mailto:zoryapolt@gmail.com">zoryapolt@gmail.com</a> | Наразі не друкуються)<br>
                               • Газета «Село полтавське» (вул. Міщенка, 2 | редактор Лариса Коба | 0508629998, <a href="mailto:spmarketing@ukr.net">spmarketing@ukr.net</a> | тираж 9580, 1р/місяць)<br>
-                              • Газета «Вісті» (вул. Шевченка, 7 | редактор Юлія Шабля | 0532608413 | тираж 600, щоп’ятниці)<br><br>
+                              • Газета «Вісті Img» (вул. Шевченка, 7 | редактор Юлія Шабля | 0532608413 | тираж 600, щоп’ятниці)<br><br>
                               <b>Онлайн-медіа:</b><br>
                               • ІВ «Новини Полтавщини» (вул. Соборності 45, кім. 517 | редактор Юрій Ніколаєв | 0501950749, <a href="mailto:np.pl.ua@gmail.com">np.pl.ua@gmail.com</a> | відвідуваність: 172 000)<br>
                               • «Полтавщина» (вул. Юліана Матвійчука, 42 | редактор Ян Пругло | 0999367455, <a href="mailto:editor@poltava.pl.ua">editor@poltava.pl.ua</a> | відвідуваність: 1 278 000)<br>
@@ -459,6 +459,37 @@
 
         const districtsRoot = document.getElementById('districts-root');
 
+        // Головна функція активації (і для карти, і для списку)
+        function activateCityInSidebar(districtId, locationId, cityCoords = null) {
+            // 1. Розгортаємо потрібний район, закриваємо інші
+            const distEl = districtElements[districtId];
+            if (distEl) {
+                const isDistActive = distEl.classList.contains('active');
+                if (!isDistActive) {
+                    document.querySelectorAll('.district-item').forEach(el => el.classList.remove('active'));
+                    distEl.classList.add('active');
+                }
+            }
+
+            // 2. Розгортаємо потрібне місто, закриваємо інші вкладені міста
+            const locEl = locationElements[locationId];
+            if (locEl) {
+                const isLocActive = locEl.classList.contains('active');
+                document.querySelectorAll('.location-item').forEach(el => el.classList.remove('active'));
+                
+                if (!isLocActive) {
+                    locEl.classList.add('active');
+                    // Автоматично відкриваємо сайдбар, якщо він був згорнутий
+                    if (sidebarContainer.classList.contains('collapsed')) { toggleBtn.click(); }
+                }
+            }
+
+            // 3. Якщо передано координати (клікнули в меню) — центруємо карту на місто
+            if (cityCoords) {
+                map.setView(cityCoords, 10, { animate: true });
+            }
+        }
+
         // Генеруємо дерево елементів
         hierarchyData.forEach(dist => {
             // Створюємо елемент Району (Рівень 1)
@@ -475,16 +506,16 @@
             `;
             
             districtsRoot.appendChild(districtLi);
-            districtElements[dist.id] = districtLi; // Кешуємо для лінків
+            districtElements[dist.id] = districtLi; // Кеш району
 
             const locationListUl = districtLi.querySelector('.location-list');
 
-            // Обробник кліку по району
-            districtLi.querySelector('.district-trigger').addEventListener('click', () => {
+            // ВИПРАВЛЕНО: Клік по самому району тепер закриває або відкриває його список
+            districtLi.querySelector('.district-trigger').addEventListener('click', (e) => {
                 const isCurrentlyActive = districtLi.classList.contains('active');
                 document.querySelectorAll('.district-item').forEach(el => el.classList.remove('active'));
+                
                 if (!isCurrentlyActive) {
-                    districtLi.add('active');
                     districtLi.classList.add('active');
                 }
             });
@@ -494,12 +525,12 @@
                 // Створюємо оригінальний маркер Leaflet на карті
                 const marker = L.marker(loc.coords).addTo(map);
                 
-                // Клік по маркеру на карті розгортає потрібний район і потрібне місто
+                // Клік на маркер відкриває меню і підсвічує рядок
                 marker.on('click', () => { 
-                    activateCityInSidebar(dist.id, loc.id); 
+                    activateCityInSidebar(dist.id, loc.id, null); 
                 });
 
-                // Створюємо елемент Міста в списку
+                // Створюємо елемент Міста в списку сайдбару
                 const listItem = document.createElement('li');
                 listItem.className = 'location-item';
                 listItem.innerHTML = `
@@ -507,13 +538,14 @@
                     <div class="location-content">${loc.desc}</div>
                 `;
 
-                // Клік по місту в списку
-                listItem.querySelector('.location-trigger').addEventListener('click', () => {
-                    activateCityInSidebar(dist.id, loc.id);
+                // Клік по місту в списку центрує карту і відкриває опис
+                listItem.querySelector('.location-trigger').addEventListener('click', (e) => {
+                    e.stopPropagation(); // щоб не тригерити клік по району
+                    activateCityInSidebar(dist.id, loc.id, loc.coords);
                 });
 
                 locationListUl.appendChild(listItem);
-                locationElements[loc.id] = listItem; // Кешуємо для лінків
+                locationElements[loc.id] = listItem; // Кеш міста
             });
         });
     </script>
