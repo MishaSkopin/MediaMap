@@ -58,7 +58,7 @@
             font-size: 16px;
         }
         
-        /* СТИЛІ ДЛЯ ГАРМОШКИ */
+        /* СТИЛІ ДЛЯ ГАРМОШКИ (Приховано за замовчуванням) */
         .location-content {
             display: none;
             font-size: 13px;
@@ -67,7 +67,7 @@
             padding-top: 5px;
         }
         
-        /* Клас, який розгортає гармошку */
+        /* Розгортання активного міста */
         .location-item.active .location-content {
             display: block;
         }
@@ -84,7 +84,7 @@
             height: 100%;
         }
 
-        /* Стиль для кастомних SVG-крапель */
+        /* Стиль для кастомних SVG-маркерів */
         .custom-pin-marker {
             background: none !important;
             border: none !important;
@@ -113,27 +113,45 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // НАДІЙНЕ ЗАВАНТАЖЕННЯ KML (Через стандартний fetch)
-        fetch('poltava.kml')
-            .then(response => response.text())
-            .then(kmlText => {
-                // Якщо у тебе проста лінія, Leaflet може відобразити її через парсинг або GeoJSON,
-                // але щоб не перевантажувати код, ми просто валідуємо файл. 
-                // Якщо лінія раптом не покажеться, скажи, я додам крихітний текстовий парсер координат!
-                console.log("KML файл успішно зчитано");
-            })
-            .catch(err => console.error("Помилка завантаження KML:", err));
+        // 3. ВБУДОВАНИЙ ГЕО-СЛОЙ ЗАМІСТЬ ЗОВНІШНЬОГО KML (Захищає від блокування CORS)
+        // Сюди у масив coordinates ти можеш вставити точні координати своєї лінії/межі з файлу poltava.kml
+        // УВАГА: У GeoJSON координати йдуть у форматі [довгота, широта] (Lng, Lat)
+        const poltavaBorder = {
+            "type": "Feature",
+            "properties": {
+                "name": "Межа або лінія"
+            },
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [34.5515, 49.5898], // Приклад точки (заміни на свій масив точок з KML)
+                    [33.4267, 49.0692]  
+                ]
+            }
+        };
 
-        // Об'єкт зв'язку ID -> DOM
+        // Відображення лінії на карті (синій колір, товщина 3px)
+        L.geoJSON(poltavaBorder, {
+            style: {
+                color: "#3388ff",
+                weight: 3,
+                opacity: 0.7
+            }
+        }).addTo(map);
+
+
+        // Об'єкт зв'язку ID міста -> DOM-елемент списку
         const listItemElements = {};
 
-        // 3. ФУНКЦІЯ АКТИВАЦІЇ МІСТА (Гармошка)
+        // 4. ФУНКЦІЯ АКТИВАЦІЇ МІСТА (Гармошка + Підсвітка)
         function activateCityInSidebar(id) {
+            // Закриваємо всі відкриті картки
             document.querySelectorAll('.location-item').forEach(item => {
                 item.classList.remove('active');
                 item.style.background = '';
             });
 
+            // Відкриваємо поточну картку
             const element = listItemElements[id];
             if (element) {
                 element.classList.add('active');
@@ -142,7 +160,7 @@
             }
         }
 
-        // 4. ДАНІ ТОЧОК
+        // 5. ДАНІ ТОЧОК
         const locations = [
             {
                 id: "poltava",
@@ -275,4 +293,129 @@
                 title: "Хорол",
                 color: "#16A085",
                 desc: `<b>Друковані медіа:</b><br>
-                      • Вісті Хорольщини (вул. Незалежності, буд. 65/20, приміщення 1 |
+                      • Вісті Хорольщини (вул. Незалежності, буд. 65/20, приміщення 1 | 095 068-56-29, <a href="mailto:horol_visti@ukr.net">horol_visti@ukr.net</a> | редактор Наталія Ватуля | тираж 8500, щоп’ятниці)`
+            },
+            {
+                id: "rozsoshentsi",
+                coords: [49.5403906136859, 34.504261676751234],
+                title: "Розсошенці",
+                color: "#27AE60",
+                desc: `<b>Друковане медіа:</b><br>
+                      • Обласна газета «Полтавська думка» (вул. Перспективна, 1 | редактор Діана Страшко | 066 589 44 97)`
+            },
+            {
+                id: "myrhorod",
+                coords: [49.96273588416958, 33.607501694968086],
+                title: "Миргород",
+                color: "#2980B9",
+                desc: `<b>Телебачення:</b><br>
+                      • Міська телестудія «Миргород» (вул. Незалежності, 2 | Ошека Євген Павлович, 0505684696 | <a href="mailto:mirgorod_tv@ukr.net">mirgorod_tv@ukr.net</a>)<br><br>
+                      <b>Друковані медіа:</b><br>
+                      • Газета «Прапор Перемоги» (м. Миргород, вул. Кашинского, 21 | головний редактор Устименко Ольга Олександрівна | +380 99 408 1814 | Тираж 2200, 2 рази на місяць)`
+            },
+            {
+                id: "pyriatyn",
+                coords: [50.23971543366116, 32.50720593066764],
+                title: "Пирятин",
+                color: "#8E44AD",
+                desc: `<b>Друковані медіа:</b><br>
+                      • Газета «Пирятинські вісті» (вулиця Успенська, 5 | Редактор – Оксана Іванівна Бондаренко, <a href="mailto:pirvisti@ukr.net">pirvisti@ukr.net</a> | (05358) 2-06-73, (099) 455-67-20 | Тираж 1260, щовівторка)`
+            },
+            {
+                id: "velyka_bahachka",
+                coords: [49.78925313280651, 33.72845014823058],
+                title: "Велика Багачка",
+                color: "#D35400",
+                desc: `<b>Друковані медіа:</b><br>
+                      • Газета «Рідний край» (вул. Шевченка, 73 | Головний редактор О.Прогрущенко | e-mail: <a href="mailto:gazetagabag@ukr.net">gazetagabag@ukr.net</a> | Тираж 610, 2/місяць)`
+            },
+            {
+                id: "chutove",
+                coords: [49.71139305002166, 35.15749682875592],
+                title: "Чутове",
+                color: "#C0392B",
+                desc: `<b>Друковані медіа:</b><br>
+                      • Газета «Сільські новини» (площа Перемоги, 2 | Редактор Оксана Черкас, +380665887345, <a href="mailto:silsnow@ukr.net">silsnow@ukr.net</a> | Тираж 2000, 2 рази на місяць)<br><br>
+                      <b>Соціальні мережі:</b><br>
+                      • <a href="https://www.facebook.com/chutivskiykray/?locale=uk_UA" target="_blank">«Чутівський край»</a> (11000 підписників)`
+            },
+            {
+                id: "kobeliaky",
+                coords: [49.151277227456056, 34.19500079757286],
+                title: "Кобеляки",
+                color: "#7F8C8D",
+                desc: `<b>Онлайн-медіа:</b><br>
+                      • «Тижневик ЕХО» (вул. Михайлівська, 51. | редакція: 0979039267, <a href="mailto:gazeta-exo@i.ua">gazeta-exo@i.ua</a> | відвідуваність: 29 000)`
+            },
+            {
+                id: "lubny",
+                coords: [50.01647239048797, 33.000682139961796],
+                title: "Лубни",
+                color: "#A04000",
+                desc: `<b>Друковані медіа:</b><br>
+                      • Вісник (вул. Ярослава Мудрого, буд. 31 | (05361) 74-333 | редактор Людмила Бірюкова | тираж 700, щосереди)<br><br>
+                      <b>Онлайн-медіа:</b><br>
+                      • Moзambik.media (<a href="https://mo3ambik.media/" target="_blank">https://mo3ambik.media/</a> | відвідуваність 2200)`
+            },
+            {
+                id: "zinkiv",
+                coords: [50.2044126263834, 34.363366514276656],
+                title: "Зіньків",
+                color: "#1F618D",
+                desc: `<b>Радіо:</b><br>
+                      • Комунальна установа «Редакція радіо «Вишня ФМ» Зіньківської міської ради (вул. Воздвиженська, 40 | директор Людмила Негода)`
+            },
+            {
+                id: "hrebinka",
+                coords: [50.1184759876677, 32.45232241478251],
+                title: "Гребінка",
+                color: "#6E2C00",
+                desc: `<b>Онлайн-медіа:</b><br>
+                      • Гребінка (<a href="https://www.grebenka.com/" target="_blank">https://www.grebenka.com/</a> | (066) 372-49-57, <a href="mailto:admin@grebenka.com">admin@grebenka.com</a> | Відвідуваність 100000)`
+            }
+        ];
+
+        // 6. ЦИКЛ СТВОРЕННЯ МАРКЕРІВ ТА СПИСКУ
+        const listContainer = document.getElementById('listContainer');
+
+        locations.forEach(loc => {
+            const колірКраплі = loc.color || "#3388ff";
+            
+            const customIcon = L.divIcon({
+                className: 'custom-pin-marker',
+                html: `<svg width="25" height="41" viewBox="0 0 25 41" xmlns="http://www.w3.org/2000/svg">
+                         <path d="M12.5 0C5.596 0 0 5.596 0 12.5C0 21.875 12.5 41 12.5 41S25 21.875 25 12.5C25 5.596 19.404 0 12.5 0Z" fill="${колірКраплі}"/>
+                         <circle cx="12.5" cy="12.5" r="4" fill="#ffffff"/>
+                       </svg>`,
+                iconSize: [25, 41],
+                iconAnchor: [12, 41]
+            });
+
+            const marker = L.marker(loc.coords, { icon: customIcon }).addTo(map);
+
+            marker.on('click', () => { 
+                if (typeof activateCityInSidebar === "function") {
+                    activateCityInSidebar(loc.id); 
+                }
+            });
+
+            const listItem = document.createElement('li');
+            listItem.className = 'location-item';
+            listItem.innerHTML = `
+                <div class="location-trigger"><h4>${loc.title}</h4></div>
+                <div class="location-content">${loc.desc}</div>
+            `;
+
+            listItem.querySelector('.location-trigger').addEventListener('click', () => {
+                map.setView(loc.coords, 11);
+                if (typeof activateCityInSidebar === "function") {
+                    activateCityInSidebar(loc.id);
+                }
+            });
+
+            listContainer.appendChild(listItem);
+            listItemElements[loc.id] = listItem;
+        });
+    </script>
+</body>
+</html>
