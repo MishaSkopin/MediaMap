@@ -3,66 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Карта Полтавської області</title>
+    <title>Карта Полтавської області з панеллю</title>
     
-    <!-- Стилі для карти -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
     <style>
-        html, body, #map {
+        /* Налаштування всього екрану */
+        html, body {
             margin: 0;
             padding: 0;
             height: 100%;
             width: 100%;
+            font-family: Arial, sans-serif;
+            display: flex; /* Розміщуємо панель і карту в один ряд */
+        }
+
+        /* Ліва бічна панель */
+        #sidebar {
+            width: 300px;
+            height: 100%;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000; /* Панель поверх карти на мобільних */
+            overflow-y: auto; /* Якщо точок багато, з'явиться прокрутка */
+        }
+
+        /* Заголовок в панелі */
+        .sidebar-header {
+            padding: 20px;
+            background-color: #1565c0;
+            color: white;
+            margin: 0;
+        }
+
+        /* Список точок */
+        .location-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Елемент списку (місто) */
+        .location-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .location-item:hover {
+            background-color: #e3f2fd;
+        }
+
+        .location-item h4 {
+            margin: 0 0 5px 0;
+            color: #1e88e5;
+        }
+
+        .location-item p {
+            margin: 0;
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        /* Карта займає весь простір, що залишився */
+        #map {
+            flex-grow: 1;
+            height: 100%;
         }
     </style>
 </head>
 <body>
 
+    <div id="sidebar">
+        <h2 class="sidebar-header">Полтавська область</h2>
+        <ul id="list" class="location-list">
+            </ul>
+    </div>
+
     <div id="map"></div>
 
-    <!-- Скрипти для карти та читання KML -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/@mapbox/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
 
     <script>
-        // Центруємо карту на Україну (масштаб 7)
-        const map = L.map('map').setView([49.0, 31.5], 7);
+        // 1. Ініціалізація карти
+        const map = L.map('map').setView([49.5, 34.0], 8); // Трішки змістили центр і наблизили до Полтавщини
 
-        // Додаємо базову карту OpenStreetMap
+        // 2. Базова карта
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
-        // Завантажуємо твій KML файл
+        // 3. Завантаження KML контурів області
         const kmlLayer = omnivore.kml('poltava.kml')
             .on('ready', function() {
                 this.setStyle({
-                    color: '#1e88e5',    // Колір межі області
-                    weight: 3,           // Товщина лінії
-                    fillColor: '#bbdefb',// Колір заливки області
-                    fillOpacity: 0.2     // Прозорість заливки
+                    color: '#1e88e5',
+                    weight: 3,
+                    fillColor: '#bbdefb',
+                    fillOpacity: 0.15
                 });
             })
             .addTo(map);
 
-        // СПИСОК ТВОЇХ ТОЧОК
-        // Сюди додавай свої координати [широта, довгота], назви та описи
+        // 4. ТВОЇ ТОЧКИ (Тут ти робиш правки тексту та координат)
         const locations = [
             {
                 coords: [49.5883, 34.5514],
-                title: "Точка 1",
-                desc: "Твій короткий опис для першої точки."
+                title: "Полтава",
+                desc: "Адміністративний центр, місто підземних ходів та галушок."
+            },
+            {
+                coords: [50.0264, 32.9922],
+                title: "Лубни",
+                desc: "Одне з найстаріших міст України з багатою історією."
             },
             {
                 coords: [49.0632, 33.4114],
-                title: "Точка 2",
-                desc: "Твій короткий опис для другої точки."
+                title: "Кременчук",
+                desc: "Потужний промисловий та культурний центр на Дніпрі."
             }
         ];
 
-        // Автоматичне додавання точок на карту
+        // Контейнер для списку в меню
+        const listContainer = document.getElementById('list');
+
+        // 5. Обробка точок: створення маркерів та меню
         locations.forEach(loc => {
+            // Створюємо маркер на карті
             const marker = L.marker(loc.coords).addTo(map);
+            
             const popupContent = `
                 <div style="font-family: Arial, sans-serif; min-width: 150px;">
                     <h3 style="margin: 0 0 5px 0; color: #1565c0;">${loc.title}</h3>
@@ -70,6 +144,25 @@
                 </div>
             `;
             marker.bindPopup(popupContent);
+
+            // Створюємо елемент списку для лівої панелі
+            const listItem = document.createElement('li');
+            listItem.className = 'location-item';
+            listItem.innerHTML = `
+                <h4>${loc.title}</h4>
+                <p>${loc.desc.substring(0, 60)}...</p> 
+            `;
+
+            // Подія КЛІКУ на елемент у лівій панелі
+            listItem.addEventListener('click', () => {
+                // 1. Наближаємо карту до точки (координати, масштаб 11)
+                map.setView(loc.coords, 11, { animate: true, duration: 1 });
+                // 2. Відкриваємо попап цього маркера
+                marker.openPopup();
+            });
+
+            // Додаємо створений елемент у меню
+            listContainer.appendChild(listItem);
         });
     </script>
 </body>
