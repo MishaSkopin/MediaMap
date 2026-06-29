@@ -5,201 +5,131 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Медіакарта Полтавщини</title>
     
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Підключення Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
     
     <style>
-        html, body {
+        /* Основні стилі інтерфейсу */
+        body {
             margin: 0;
             padding: 0;
-            height: 100%;
-            width: 100%;
             font-family: Arial, sans-serif;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* КАРТА НА ВЕСЬ ЕКРАН */
-        #map {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        /* КАРКАС ПАНЕЛІ (поверх карти) */
-        #sidebar-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
             display: flex;
-            z-index: 2000;
-            transition: transform 0.3s ease;
+            height: 100vh;
         }
-
-        /* Згортання панелі */
-        #sidebar-container.collapsed {
-            transform: translateX(-350px);
-        }
-
         #sidebar {
             width: 350px;
-            height: 100%;
-            background-color: #fcfcfc;
-            border-right: 1px solid #ddd;
-            box-shadow: 4px 0 12px rgba(0,0,0,0.15);
+            background: #ffffff;
+            border-right: 1px solid #ccc;
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000;
         }
-
-        #toggle-btn {
-            width: 25px;
-            height: 60px;
-            background-color: #007bff;
-            color: white;
-            border: 1px solid #0056b3;
-            border-left: none;
-            border-radius: 0 8px 8px 0;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: bold;
-            align-self: center;
-            box-shadow: 3px 0 5px rgba(0,0,0,0.2);
-            user-select: none;
+        #sidebar-header {
+            padding: 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
         }
-
-        .sidebar-header {
-            padding: 20px;
-            background-color: #007bff;
-            color: white;
+        #sidebar-header h2 {
             margin: 0;
-            font-size: 1.3rem;
+            font-size: 20px;
+            color: #333;
         }
-
-        .location-list {
+        #listContainer {
             list-style: none;
             padding: 0;
             margin: 0;
+            overflow-y: auto;
+            flex-grow: 1;
         }
-
         .location-item {
             border-bottom: 1px solid #eee;
+            padding: 10px 15px;
+            transition: background 0.2s;
         }
-
+        .location-item:hover {
+            background: #f1f3f5;
+        }
         .location-trigger {
-            padding: 18px 20px;
             cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #fff;
         }
-
         .location-trigger h4 {
-            margin: 0;
-            color: #333;
-            font-size: 1.15rem;
+            margin: 0 0 5px 0;
+            color: #007bff;
+            font-size: 16px;
         }
-
         .location-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-            background-color: #fafafa;
-            padding: 0 20px;
             font-size: 13px;
-            color: #444;
+            color: #555;
+            line-height: 1.4;
+        }
+        .location-content a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .location-content a:hover {
+            text-decoration: underline;
+        }
+        #map {
+            flex-grow: 1;
+            height: 100%;
         }
 
-        .location-item.active .location-trigger {
-            background-color: #e8f0fe;
+        /* Стиль для скидання дефолтних квадратів Leaflet навколо кастомних SVG-крапель */
+        .custom-pin-marker {
+            background: none !important;
+            border: none !important;
         }
-
-        .location-item.active .location-content {
-            max-height: 2000px;
-            padding: 15px 20px;
-            border-top: 1px solid #e2e8f0;
-        }
-        /* Стиль для кольорових класичних крапель */
-.custom-pin-marker {
-    background: none !important;
-    border: none !important;
-}
-
-.marker-pin {
-    width: 25px;
-    height: 41px;
-    background-image: url('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    position: relative;
-}
-
-/* Робимо точне фарбування через маску, щоб кольори з JS збігалися на 100% */
-.marker-pin::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 25px;
-    height: 41px;
-    background-image: url('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-color: var(--marker-color);
-    background-blend-mode: multiply;
-    -webkit-mask-image: url('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png');
-    mask-image: url('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png');
-    -webkit-mask-size: contain;
-    mask-size: contain;
-    mix-blend-mode: color;
-}
     </style>
 </head>
 <body>
 
-    <div id="map"></div>
-
-    <div id="sidebar-container">
-        <div id="sidebar">
-            <h2 class="sidebar-header">ЗМІ Полтавщини</h2>
-            <ul id="list" class="location-list"></ul>
+    <!-- Бокова панель -->
+    <div id="sidebar">
+        <div id="sidebar-header">
+            <h2>Медіа Полтавщини</h2>
         </div>
-        <div id="toggle-btn">‹</div>
+        <ul id="listContainer"></ul>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/@mapbox/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
+    <!-- Карта -->
+    <div id="map"></div>
+
+    <!-- Підключення Leaflet JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
 
     <script>
-        // 1. Карта
-        const map = L.map('map').setView([49.5, 34.0], 8);
+        // 1. ІНІЦІАЛІЗАЦІЯ КАРТИ (Центр — Полтавська область)
+        const map = L.map('map').setView([49.5898, 34.5515], 9);
 
+        // 2. ПІДКЛЮЧЕННЯ СЛОЮ КАРТИ (OpenStreetMap)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
+            attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // 2. KML
-        try {
-            omnivore.kml('poltava.kml').addTo(map);
-        } catch(e) { console.log(e); }
+        // Об'єкт для зберігання зв'язку між ID міст та DOM-елементами списку
+        const listItemElements = {};
 
-        // 3. Кнопка
-        const sidebarContainer = document.getElementById('sidebar-container');
-        const toggleBtn = document.getElementById('toggle-btn');
+        // 3. ФУНКЦІЯ АКТИВАЦІЇ МІСТА (клік на маркер або елемент списку)
+        function activateCityInSidebar(id) {
+            console.log("Активовано місто:", id);
+            
+            // Зняти підсвітку з усіх елементів списку
+            document.querySelectorAll('.location-item').forEach(item => {
+                item.style.background = '';
+            });
 
-        toggleBtn.addEventListener('click', () => {
-            sidebarContainer.classList.toggle('collapsed');
-            toggleBtn.innerText = sidebarContainer.classList.contains('collapsed') ? '›' : '‹';
-        });
+            // Підсвітити потрібний елемент списку та скролити до нього
+            const element = listItemElements[id];
+            if (element) {
+                element.style.background = '#e9ecef';
+                element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
 
-const locations = [
+        // 4. ДАНІ ТОЧОК (СПИСОК МІСТ, КОЛЬОРИ ТА АКТИВНІ ПОШТИ)
+        const locations = [
             {
                 id: "poltava",
                 coords: [49.589871583757116, 34.55153736319904],
@@ -218,7 +148,7 @@ const locations = [
                       • Газета «Вечірня Полтава» (Вул. Раїси Кириченко, 36 | редактор Володимир Марченко | 0507333777, <a href="mailto:mvp7@ukr.net">mvp7@ukr.net</a> | тираж 13170, щосереди)<br>
                       • Газета «Полтавський вісник» (Вул. Європейська, 8 | 956909503, <a href="mailto:visnyk.poltava@gmail.com">visnyk.poltava@gmail.com</a> | тираж 1000, 1р/місяць)<br>
                       • Газета «Зоря Полтавщини» (вул. Матвійчука, 115 | редактор Ірина Рогожинська | (0532)560525, <a href="mailto:zoryapolt@gmail.com">zoryapolt@gmail.com</a> | Наразі не друкуються)<br>
-                      • Газета «Село полтавське» (вул. Міщенка, 2 | редактор Лариса Коба | 0508629998, <a href="mailto:spmarketing@ukr.net">spmarketing@ukr.net</a> | тираж 9580, 1р/місяць)<br>
+                      • Газета «Село полтавське seaw» (вул. Міщенка, 2 | редактор Лариса Коба | 0508629998, <a href="mailto:spmarketing@ukr.net">spmarketing@ukr.net</a> | тираж 9580, 1р/місяць)<br>
                       • Газета «Вісті» (вул. Шевченка, 7 | редактор Юлія Шабля | 0532608413 | тираж 600, щоп’ятниці)<br><br>
                       <b>Онлайн-медіа:</b><br>
                       • ІВ «Новини Полтавщини» (вул. Соборності 45, кім. 517 | редактор Юрій Ніколаєв | 0501950749, <a href="mailto:np.pl.ua@gmail.com">np.pl.ua@gmail.com</a> | відвідуваність: 172 000)<br>
@@ -226,7 +156,7 @@ const locations = [
                       • «Полтавська хвиля» (вул. В.Чорновола, 19-А, офіс 3 | редактор: Віталій Улибін | 0660671520, <a href="mailto:info@poltavawave.com.ua">info@poltavawave.com.ua</a> | відвідуваність: 234 000)<br>
                       • «Зміст» (вул. Соборності, 40 | редактор Анастасія Дорряк | 0502718025, <a href="mailto:zmist.pl@gmail.com">zmist.pl@gmail.com</a> | відвідуваність: 186 000)<br>
                       • «Коло» (вул. Соборності, 50 | редактор Тетяна Цирульник | 0959171232, <a href="mailto:kolo.news.poltava@gmail.com">kolo.news.poltava@gmail.com</a> | відвідуваність: 133 000)<br>
-                      • «0532.ua» (вул. Соборності, 46, оф. 174 | editor.0532@gmail.com | відвідуваність: 184 000)<br>
+                      • «0532.ua» (вул. Соборності, 46, оф. 174 | редактор Юлія Голованова | 0665761517, <a href="mailto:editor.0532@gmail.com">editor.0532@gmail.com</a> | відвідуваність: 184 000)<br>
                       • «Полтава 365» (вул. Котляревського, 22-Б | редактор Станіслав Майзус | 0675326292 | відвідуваність: 33 000)<br>
                       • «Новини Полтавщини» (вул. Котляревського, 3 | <a href="mailto:office@poltava.cc">office@poltava.cc</a> | відвідуваність: 3 700)<br>
                       • «Полтава 24» (вул. Старий Поділ, 4 | редактор Сергій Кравченко | 0532276334, <a href="mailto:ask@poltava24.com.ua">ask@poltava24.com.ua</a> | відвідуваність: 25 100)<br>
@@ -256,7 +186,7 @@ const locations = [
                       <b>Друковані медіа:</b><br>
                       • Газета «Для дому і сім’ї» (Шевченко, 50а | редактор Мирослава Українська | 0507574356, <a href="mailto:gazetakremenchuk@gmail.com">gazetakremenchuk@gmail.com</a> | тираж 8 500, щочетверга)<br><br>
                       <b>Онлайн-медіа:</b><br>
-                      • Кременчуцький ТелеграфЪ + друк. (вул. Шевченка, 50-А | редактор Леся Лазоренко | 0686404448, <a href="mailto:telegraf.in.ua@gmail.com">telegraf.in.ua@gmail.com</a> | Відвідуваність: 468 000)<br>
+                      • Кременчуцький ТелеграфЪ + друк. (вул. Шевченка, 50-A | редактор Леся Лазоренко | 0686404448, <a href="mailto:telegraf.in.ua@gmail.com">telegraf.in.ua@gmail.com</a> | Відвідуваність: 468 000)<br>
                       • Кременчуцька газета + друк. (вул. Старшого лейтенанта Кагала, 45 | редактор Олег Булашев | 0675308797, <a href="mailto:advkgua@gmail.com">advkgua@gmail.com</a> | відвідуваність: 469 000)<br>
                       • «Кременчуг тудей» (редактор Василь Сердюк (псевдонім) | <a href="mailto:info@kremen.today">info@kremen.today</a> | відвідуваність: 169 000)<br><br>
                       <b>Соціальні мережі:</b><br>
@@ -317,10 +247,10 @@ const locations = [
                 id: "reshetylivka",
                 coords: [49.56440548086894, 34.07979173037247],
                 title: "Решетилівка",
-                color: "#34495E", // Темно-синій
+                color: "#34495E", // Асфальтовий
                 desc: `<b>Друковані медіа:</b><br>
                       • Решетилівський вісник (вул. Шевченка, 4 | 066 332 91 04, <a href="mailto:resvisnik@gmail.com">resvisnik@gmail.com</a> | редактор Циган Іван Іванович)<br><br>
-                      <b>Онлайн-медіа:</b><br>
+                      <b>Online-media:</b><br>
                       • Решетилівщина (вул. Покровська, 16 | <a href="https://resh.news/" target="_blank">https://resh.news/</a> | <a href="mailto:ads@relife.media">ads@relife.media</a> | 4300 відвідувань)<br><br>
                       <b>Радіо:</b><br>
                       • Релайф (вул. Шевченка, 4 | 0990110911, 0509760542, <a href="mailto:radio_reshet@ukr.net">radio_reshet@ukr.net</a> | редактор Ігор Петраков)`
@@ -329,7 +259,7 @@ const locations = [
                 id: "khorol",
                 coords: [49.781980660838684, 33.27406690711789],
                 title: "Хорол",
-                color: "#16A085", // Зелена бірюза
+                color: "#16A085", // Темно-бірюзовий
                 desc: `<b>Друковані медіа:</b><br>
                       • Вісті Хорольщини (вул. Незалежності, буд. 65/20, приміщення 1 | 095 068-56-29, <a href="mailto:horol_visti@ukr.net">horol_visti@ukr.net</a> | редактор Наталія Ватуля | тираж 8500, щоп’ятниці)`
             },
@@ -337,7 +267,7 @@ const locations = [
                 id: "rozsoshentsi",
                 coords: [49.5403906136859, 34.504261676751234],
                 title: "Розсошенці",
-                color: "#27AE60", // Насичений зелений
+                color: "#27AE60", // Темно-зелений
                 desc: `<b>Друковане медіа:</b><br>
                       • Обласна газета «Полтавська думка» (вул. Перспективна, 1 | редактор Діана Страшко | 066 589 44 97)`
             },
@@ -345,7 +275,7 @@ const locations = [
                 id: "myrhorod",
                 coords: [49.96273588416958, 33.607501694968086],
                 title: "Миргород",
-                color: "#2980B9", // Глибокий синій
+                color: "#2980B9", // Насичений синій
                 desc: `<b>Телебачення:</b><br>
                       • Міська телестудія «Миргород» (вул. Незалежності, 2 | Ошека Євген Павлович, 0505684696 | <a href="mailto:mirgorod_tv@ukr.net">mirgorod_tv@ukr.net</a>)<br><br>
                       <b>Друковані медіа:</b><br>
@@ -355,15 +285,15 @@ const locations = [
                 id: "pyriatyn",
                 coords: [50.23971543366116, 32.50720593066764],
                 title: "Пирятин",
-                color: "#8E44AD", // Темно-фіолетовий
-                desc: `<b>Друковані media:</b><br>
+                color: "#8E44AD", // Аметистовий
+                desc: `<b>Друковані медіа:</b><br>
                       • Газета «Пирятинські вісті» (вулиця Успенська, 5 | Редактор – Оксана Іванівна Бондаренко, <a href="mailto:pirvisti@ukr.net">pirvisti@ukr.net</a> | (05358) 2-06-73, (099) 455-67-20 | Тираж 1260, щовівторка)`
             },
             {
                 id: "velyka_bahachka",
                 coords: [49.78925313280651, 33.72845014823058],
                 title: "Велика Багачка",
-                color: "#D35400", // Темно-помаранчевий
+                color: "#D35400", // Цегляний
                 desc: `<b>Друковані медіа:</b><br>
                       • Газета «Рідний край» (вул. Шевченка, 73 | Головний редактор О.Прогрущенко | e-mail: <a href="mailto:gazetagabag@ukr.net">gazetagabag@ukr.net</a> | Тираж 610, 2/місяць)`
             },
@@ -371,7 +301,7 @@ const locations = [
                 id: "chutove",
                 coords: [49.71139305002166, 35.15749682875592],
                 title: "Чутове",
-                color: "#C0392B", // Бордовий
+                color: "#C0392B", // Темно-червоний
                 desc: `<b>Друковані медіа:</b><br>
                       • Газета «Сільські новини» (площа Перемоги, 2 | Редактор Оксана Черкас, +380665887345, <a href="mailto:silsnow@ukr.net">silsnow@ukr.net</a> | Тираж 2000, 2 рази на місяць)<br><br>
                       <b>Соціальні мережі:</b><br>
@@ -381,7 +311,7 @@ const locations = [
                 id: "kobeliaky",
                 coords: [49.151277227456056, 34.19500079757286],
                 title: "Кобеляки",
-                color: "#7F8C8D", // Сірий
+                color: "#7F8C8D", // Сталевий
                 desc: `<b>Онлайн-медіа:</b><br>
                       • «Тижневик ЕХО» (вул. Михайлівська, 51. | редакція: 0979039267, <a href="mailto:gazeta-exo@i.ua">gazeta-exo@i.ua</a> | відвідуваність: 29 000)`
             },
@@ -399,7 +329,7 @@ const locations = [
                 id: "zinkiv",
                 coords: [50.2044126263834, 34.363366514276656],
                 title: "Зіньків",
-                color: "#1F618D", // Сталевий синій
+                color: "#1F618D", // Маренго
                 desc: `<b>Радіо:</b><br>
                       • Комунальна установа «Редакція радіо «Вишня ФМ» Зіньківської міської ради (вул. Воздвиженська, 40 | директор Людмила Негода)`
             },
@@ -407,55 +337,60 @@ const locations = [
                 id: "hrebinka",
                 coords: [50.1184759876677, 32.45232241478251],
                 title: "Гребінка",
-                color: "#6E2C00", // Темно-шоколадний
+                color: "#6E2C00", // Шоколадний
                 desc: `<b>Онлайн-медіа:</b><br>
                       • Гребінка (<a href="https://www.grebenka.com/" target="_blank">https://www.grebenka.com/</a> | (066) 372-49-57, <a href="mailto:admin@grebenka.com">admin@grebenka.com</a> | Відвідуваність 100000)`
             }
         ];
 
-        const listContainer = document.getElementById('list');
-        const listItemsElements = {};
+        // 5. ЦИКЛ СТВОРЕННЯ МАРКЕРІВ ТА СПИСКУ
+        const listContainer = document.getElementById('listContainer');
 
-        function activateCityInSidebar(id) {
-            const element = listItemsElements[id];
-            if (!element) return;
-            const isAlreadyActive = element.classList.contains('active');
-            document.querySelectorAll('.location-item').forEach(el => el.classList.remove('active'));
-            if (!isAlreadyActive) {
-                element.classList.add('active');
-                if (sidebarContainer.classList.contains('collapsed')) { toggleBtn.click(); }
-            }
-        }
+        locations.forEach(loc => {
+            // Отримуємо унікальний колір або даємо синій за замовчуванням
+            const колірКраплі = loc.color || "#3388ff";
+            
+            // Генеруємо кастомну SVG-краплю класичної форми
+            const customIcon = L.divIcon({
+                className: 'custom-pin-marker',
+                html: `<svg width="25" height="41" viewBox="0 0 25 41" xmlns="http://www.w3.org/2000/svg">
+                         <path d="M12.5 0C5.596 0 0 5.596 0 12.5C0 21.875 12.5 41 12.5 41S25 21.875 25 12.5C25 5.596 19.404 0 12.5 0Z" fill="${колірКраплі}"/>
+                         <circle cx="12.5" cy="12.5" r="4" fill="#ffffff"/>
+                       </svg>`,
+                iconSize: [25, 41],
+                iconAnchor: [12, 41]
+            });
 
-locations.forEach(loc => {
-    // Створюємо стандартну краплю, яка передає свій унікальний колір у CSS
-    const marker = L.marker(loc.coords, {
-        icon: L.divIcon({
-            className: 'custom-pin-marker',
-            html: `<div class="marker-pin" style="--marker-color: ${loc.color};"></div>`,
-            iconSize: [25, 41],
-            iconAnchor: [12, 41]
-        })
-    }).addTo(map);
+            // Додаємо маркер на карту
+            const marker = L.marker(loc.coords, { icon: customIcon }).addTo(map);
 
-    // Виправлено регістр літери "B" у назві функції
-    marker.on('click', () => { activateCityInSidebar(loc.id); });
+            // Клік на маркер активує місто в сайдбарі
+            marker.on('click', () => { 
+                if (typeof activateCityInSidebar === "function") {
+                    activateCityInSidebar(loc.id); 
+                }
+            });
 
-    const listItem = document.createElement('li');
-    listItem.className = 'location-item';
-    listItem.innerHTML = `
-        <div class="location-trigger"><h4>${loc.title}</h4></div>
-        <div class="location-content">${loc.desc}</div>
-    `;
+            // Створюємо елемент списку
+            const listItem = document.createElement('li');
+            listItem.className = 'location-item';
+            listItem.innerHTML = `
+                <div class="location-trigger"><h4>${loc.title}</h4></div>
+                <div class="location-content">${loc.desc}</div>
+            `;
 
-    // Тут також виправлено на activateCityInSidebar
-    listItem.querySelector('.location-trigger').addEventListener('click', () => {
-        activateCityInSidebar(loc.id);
-    });
+            // Клік на заголовок міста в списку активує його та центрує карту
+            listItem.querySelector('.location-trigger').addEventListener('click', () => {
+                map.setView(loc.coords, 11); // Центруємо карту на місті з легким зумом
+                if (typeof activateCityInSidebar === "function") {
+                    activateCityInSidebar(loc.id);
+                }
+            });
 
-    listContainer.appendChild(listItem);
-    listItemElements[loc.id] = listItem;
-});
+            // Додаємо в DOM та зберігаємо посилання
+            listContainer.appendChild(listItem);
+            listItemElements[loc.id] = listItem;
+        });
     </script>
 </body>
 </html>
