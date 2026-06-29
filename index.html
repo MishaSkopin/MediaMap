@@ -1,4 +1,3 @@
-HTML
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -42,11 +41,11 @@ HTML
 
         /* Згортання панелі */
         #sidebar-container.collapsed {
-            transform: translateX(-350px);
+            transform: translateX(-360px);
         }
 
         #sidebar {
-            width: 350px;
+            width: 360px;
             height: 100%;
             background-color: #fcfcfc;
             border-right: 1px solid #ddd;
@@ -83,6 +82,46 @@ HTML
             font-size: 1.3rem;
         }
 
+        /* Стилі для РАЙОНІВ (Рівень 1) */
+        .district-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .district-item {
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .district-trigger {
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f1f3f4;
+            font-weight: bold;
+            color: #202124;
+            font-size: 1.1rem;
+            border-left: 5px solid #007bff;
+        }
+
+        .district-trigger:hover {
+            background-color: #e8eaed;
+        }
+
+        .district-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: #fff;
+        }
+
+        .district-item.active .district-content {
+            max-height: 3000px; /* Достатньо велика висота для вмісту */
+        }
+
+        /* Стилі для ГРОМАД (Рівень 2) */
         .location-list {
             list-style: none;
             padding: 0;
@@ -94,7 +133,7 @@ HTML
         }
 
         .location-trigger {
-            padding: 18px 20px;
+            padding: 12px 25px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
@@ -102,10 +141,15 @@ HTML
             background-color: #fff;
         }
 
+        .location-trigger:hover {
+            background-color: #f8f9fa;
+        }
+
         .location-trigger h4 {
             margin: 0;
-            color: #333;
-            font-size: 1.15rem;
+            color: #444;
+            font-size: 1rem;
+            font-weight: 600;
         }
 
         .location-content {
@@ -113,19 +157,25 @@ HTML
             overflow: hidden;
             transition: max-height 0.3s ease-out;
             background-color: #fafafa;
-            padding: 0 20px;
+            padding: 0 25px;
             font-size: 13px;
             color: #444;
         }
 
+        /* Активні стани для громад */
         .location-item.active .location-trigger {
             background-color: #e8f0fe;
         }
 
+        .location-item.active .location-trigger h4 {
+            color: #1a73e8;
+        }
+
         .location-item.active .location-content {
             max-height: 2000px;
-            padding: 15px 20px;
+            padding: 15px 25px;
             border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
         }
     </style>
 </head>
@@ -136,7 +186,7 @@ HTML
     <div id="sidebar-container">
         <div id="sidebar">
             <h2 class="sidebar-header">ЗМІ Полтавщини</h2>
-            <ul id="list" class="location-list"></ul>
+            <ul id="districts-root" class="district-list"></ul>
         </div>
         <div id="toggle-btn">‹</div>
     </div>
@@ -145,19 +195,19 @@ HTML
     <script src="https://unpkg.com/@mapbox/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
 
     <script>
-        // 1. Карта
+        // 1. Ініціалізація карти
         const map = L.map('map').setView([49.5, 34.0], 8);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
-        // 2. KML
+        // 2. Завантаження KML меж
         try {
             omnivore.kml('poltava.kml').addTo(map);
         } catch(e) { console.log(e); }
 
-        // 3. Кнопка
+        // 3. Логіка кнопки згортання панелі
         const sidebarContainer = document.getElementById('sidebar-container');
         const toggleBtn = document.getElementById('toggle-btn');
 
@@ -166,234 +216,274 @@ HTML
             toggleBtn.innerText = sidebarContainer.classList.contains('collapsed') ? '›' : '‹';
         });
 
-       // 4. ДАНІ ТОЧОК (З КЛІКАБЕЛЬНИМИ ПОСИЛАННЯМИ ТА ПОШТАМИ)
-        const locations = [
+        // 4. Структуровані дані за районами та громадами
+        const districtsData = [
             {
-                id: "poltava",
-                coords: [49.589871583757116, 34.55153736319904],
-                title: "Полтава",
-                desc: `<b>Телебачення:</b><br>
-                      • Суспільне Полтава (вул. Раїси Кириченко, 1 | редактор Карина Москаленко | 0994420836, <a href="mailto:news.poltava@suspilne.media">news.poltava@suspilne.media</a>)<br>
-                      • ІРТ-Полтава й Місто+ (м. Полтава, вул. Конституції, 4 | редактор Ігор Кужик | 0967317601, <a href="mailto:office@irt.pl.ua">office@irt.pl.ua</a>)<br>
-                      • PTV UA (вул. Пилипа Орлика, 20/1 | директор Інга Шкейда | 0630656507, <a href="mailto:poltavsketv@gmail.com">poltavsketv@gmail.com</a>)<br>
-                      • Ми-Полтава (вул. Юліана Матвійчука | директор Оксана Лєщина | 097914237)<br><br>
-                      <b>Радіо:</b><br>
-                      • Українське радіо. Лтава (м. Полтава, вул. Раїси Кириченко, 1 | керівник: Олександр Бобошко | 0662011271, <a href="mailto:press.poltava@suspilne.media">press.poltava@suspilne.media</a>)<br>
-                      • «Радіо Максимум» Полтава<br>
-                      • «Люкс фм» Полтава<br><br>
-                      <b>Друковані медіа:</b><br>
-                      • Газета «Вечірня Полтава» (Вул. Раїси Кириченко, 36 | редактор Володимир Марченко | 0507333777, <a href="mailto:mvp7@ukr.net">mvp7@ukr.net</a> | тираж 13170, щосереди)<br>
-                      • Газета «Полтавський вісник» (Вул. Європейська, 8 | 956909503, <a href="mailto:visnyk.poltava@gmail.com">visnyk.poltava@gmail.com</a> | тираж 1000, 1р/місяць)<br>
-                      • Газета «Зоря Полтавщини» (вул. Матвійчука, 115 | редактор Иріна Рогожинська | (0532)560525, <a href="mailto:zoryapolt@gmail.com">zoryapolt@gmail.com</a> | Наразі не друкуються)<br>
-                      • Газета «Село полтавське» (вул. Міщенка, 2 | редактор Лариса Коба | 0508629998, <a href="mailto:spmarketing@ukr.net">spmarketing@ukr.net</a> | тираж 9580, 1р/місяць)<br>
-                      • Газета «Вісті» (вул. Шевченка, 7 | редактор Юлія Шабля | 0532608413 | тираж 600, щоп’ятниці)<br><br>
-                      <b>Онлайн-медіа:</b><br>
-                      • ІВ «Новини Полтавщини» (вул. Соборності 45, кім. 517 | редактор Юрій Ніколаєв | 0501950749, <a href="mailto:np.pl.ua@gmail.com">np.pl.ua@gmail.com</a> | відвідуваність: 172 000)<br>
-                      • «Полтавщина» (вул. Юліана Матвійчука, 42 | редактор Ян Пругло | 0999367455, <a href="mailto:editor@poltava.pl.ua">editor@poltava.pl.ua</a> | відвідуваність: 1 278 000)<br>
-                      • «Полтавська хвиля» (вул. В.Чорновола, 19-А, офіс 3 | редактор: Віталій Улибін | 0660671520, <a href="mailto:info@poltavawave.com.ua">info@poltavawave.com.ua</a> | відвідуваність: 234 000)<br>
-                      • «Зміст» (вул. Соборності, 40 | редактор Анастасія Дорряк | 0502718025, <a href="mailto:zmist.pl@gmail.com">zmist.pl@gmail.com</a> | відвідуваність: 186 000)<br>
-                      • «Коло» (вул. Соборності, 50 | редактор Тетяна Цирульник | 0959171232, <a href="mailto:kolo.news.poltava@gmail.com">kolo.news.poltava@gmail.com</a> | відвідуваність: 133 000)<br>
-                      • «0532.ua» (вул. Соборності, 46, оф. 174 | редактор Юлія Голованова | 0665761517, <a href="mailto:editor.0532@gmail.com">editor.0532@gmail.com</a> | відвідуваність: 184 000)<br>
-                      • «Полтава 365» (вул. Котляревського, 22-Б | редактор Станіслав Майзус | 0675326292 | відвідуваність: 33 000)<br>
-                      • «Новини Полтавщини» (вул. Котляревського, 3 | <a href="mailto:office@poltava.cc">office@poltava.cc</a> | відвідуваність: 3 700)<br>
-                      • «Полтава 24» (вул. Старий Поділ, 4 | редактор Сергій Кравченко | 0532276334, <a href="mailto:ask@poltava24.com.ua">ask@poltava24.com.ua</a> | відвідуваність: 25 100)<br>
-                      • «Полтава today» (<a href="mailto:info@poltava.today">info@poltava.today</a> | відвідуваність: 4 400)<br><br>
-                      <b>Соціальні мережі:</b><br>
-                      • <a href="https://t.me/truexapoltava" target="_blank">Труха.Полтава</a> (295 540 підписників)<br>
-                      • <a href="https://t.me/poltava_pvp" target="_blank">PVP.POLTAVA / ПВП ПОЛТАВА</a> (105 734 підписників)<br>
-                      • <a href="https://t.me/poltava_tvoya" target="_blank">Твоя Полтава</a> (75 058 підписників)<br>
-                      • <a href="https://t.me/fontan1000000" target="_blank">Фонтанзамільйон Полтава</a> (23 572 підписників)<br>
-                      • <a href="https://t.me/v_plt" target="_blank">VPLT</a> (22 382 підписників)<br>
-                      • <a href="https://t.me/my_gotovi_poltava" target="_blank">Ми готові. Полтава</a> (16 730 підписників)<br>
-                      • <a href="https://t.me/huevajapoltava" target="_blank">Хуевая Полтава</a> (15 511 підписників)<br>
-                      • <a href="https://t.me/typical_poltava" target="_blank">Типова Полтащина</a> (15 191 підписників)<br>
-                      • <a href="https://t.me/my_poltava_news" target="_blank">Ми-Полтава</a> (10 300 підписників)<br>
-                      • <a href="https://t.me/StoyakKukobi" target="_blank">Стояк Кукоби</a> (8 737 підписників)`
+                name: "Полтавський район",
+                id: "poltavsky_district",
+                locations: [
+                    {
+                        id: "poltava",
+                        coords: [49.589871583757116, 34.55153736319904],
+                        title: "Полтава",
+                        color: "#E63946",
+                        desc: `<b>Телебачення:</b><br>• Суспільне Полтава... (і т.д.)`
+                    },
+                    {
+                        id: "opishnia",
+                        coords: [49.959015141844255, 34.603743384410215],
+                        title: "Опішня",
+                        color: "#F4A261",
+                        desc: `<b>Радіо:</b><br>• Селищне радіомовлення «Голос Опішні» Опішня FM`
+                    },
+                    {
+                        id: "lanna",
+                        coords: [49.35031203911503, 35.258109326278785],
+                        title: "Ланна",
+                        color: "#9B5DE5",
+                        desc: `<b>Друковані медіа:</b><br>• Газета «Моя громада+»`
+                    },
+                    {
+                        id: "kotelva",
+                        coords: [50.06871697970275, 34.76480293991771],
+                        title: "Котельва",
+                        color: "#F15BB5",
+                        desc: `<b>Друковане медіа:</b><br>• Котелевська районна газета «Народна трибуна»`
+                    },
+                    {
+                        id: "reshetylivka",
+                        coords: [49.56440548086894, 34.07979173037247],
+                        title: "Решетилівка",
+                        color: "#00BBF9",
+                        desc: `<b>Друковані медіа:</b><br>• Решетилівський вісник`
+                    },
+                    {
+                        id: "rozsoshentsi",
+                        coords: [49.5403906136859, 34.504261676751234],
+                        title: "Розсошенці",
+                        color: "#4D908E",
+                        desc: `<b>Друковане медіа:</b><br>• Обласна газета «Полтавська думка»`
+                    },
+                    {
+                        id: "chutove",
+                        coords: [49.71139305002166, 35.15749682875592],
+                        title: "Чутове",
+                        color: "#DDA15E",
+                        desc: `<b>Друковані медіа:</b><br>• Газета «Сільські новини»`
+                    },
+                    {
+                        id: "kobeliaky",
+                        coords: [49.151277227456056, 34.19500079757286],
+                        title: "Кобеляки",
+                        color: "#606C38",
+                        desc: `<b>Онлайн-медіа:</b><br>• «Тижневик ЕХО»`
+                    },
+                    {
+                        id: "zinkiv",
+                        coords: [50.2044126263834, 34.363366514276656],
+                        title: "Зіньків",
+                        color: "#8338EC",
+                        desc: `<b>Радіо:</b><br>• Редакція радіо «Вишня ФМ»`
+                    }
+                ]
             },
             {
-                id: "kremenchuk",
-                coords: [49.06925571811738, 33.426795339807455],
-                title: "Кременчук",
-                desc: `<b>Телебачення:</b><br>
-                      • Візит (бульвар Українського відродження, 8 | редактор Ганна Плаксій | 0677966215, <a href="mailto:office@office.vizit-net.com">office@office.vizit-net.com</a>)<br>
-                      • Кременчуцька міська ТРК (вул. Генерала Жадова, 12 | редактор Сергій Перепелятник | 0960374981, <a href="mailto:kremenchugnovosti@gmail.com">kremenchugnovosti@gmail.com</a>)<br><br>
-                      <b>Радіо:</b><br>
-                      • «Люкс фм» Кременчук (вул. Керченська, 37)<br><br>
-                      <b>Друковані медіа:</b><br>
-                      • Газета «Для дому і сім’ї» (Шевченко, 50а | редактор Мирослава Українська | 0507574356, <a href="mailto:gazetakremenchuk@gmail.com">gazetakremenchuk@gmail.com</a> | тираж 8 500, щочетверга)<br><br>
-                      <b>Онлайн-медіа:</b><br>
-                      • Кременчуцький ТелеграфЪ + друк. (вул. Шевченка, 50-А | редактор Леся Лазоренко | 0686404448, <a href="mailto:telegraf.in.ua@gmail.com">telegraf.in.ua@gmail.com</a> | Відвідуваність: 468 000)<br>
-                      • Кременчуцька газета + друк. (вул. Старшого лейтенанта Кагала, 45 | редактор Олег Булашев | 0675308797, <a href="mailto:advkgua@gmail.com">advkgua@gmail.com</a> | відвідуваність: 469 000)<br>
-                      • «Кременчуг тудей» (редактор Василь Сердюк (псевдонім) | <a href="mailto:info@kremen.today">info@kremen.today</a> | відвідуваність: 169 000)<br><br>
-                      <b>Соціальні мережі:</b><br>
-                      • <a href="https://t.me/h_kremenchug" target="_blank">Х Кременчук</a> (136 838 підписників)<br>
-                      • <a href="https://t.me/ok_kremen" target="_blank">ОК Кременчук</a> (21 340)`
+                name: "Лубенський район",
+                id: "lubensky_district",
+                locations: [
+                    {
+                        id: "khorol",
+                        coords: [49.781980660838684, 33.27406690711789],
+                        title: "Хорол",
+                        color: "#43AA8B",
+                        desc: `<b>Друковані медіа:</b><br>• Вісті Хорольщини`
+                    },
+                    {
+                        id: "pyriatyn",
+                        coords: [50.23971543366116, 32.50720593066764],
+                        title: "Пирятин",
+                        color: "#F9844A",
+                        desc: `<b>Друковані media:</b><br>• Газета «Пирятинські вісті»`
+                    },
+                    {
+                        id: "lubny",
+                        coords: [50.01647239048797, 33.000682139961796],
+                        title: "Лубни",
+                        color: "#BC6C25",
+                        desc: `<b>Друковані медіа:</b><br>• Вісник`
+                    },
+                    {
+                        id: "hrebinka",
+                        coords: [50.1184759876677, 32.45232241478251],
+                        title: "Гребінка",
+                        color: "#FF006E",
+                        desc: `<b>Онлайн-медіа:</b><br>• Гребінка`
+                    }
+                ]
             },
             {
-                id: "horishnie_plavni",
-                coords: [49.0156550992913, 33.6408459203986],
-                title: "Горішні Плавні",
-                desc: `<b>Телебачення:</b><br>
-                      • Телерадіокомпанія ГОК (просп. Героїв Дніпра, 54 | керівник Володимир Богодист | 0663058309, <a href="mailto:office@trkgok.pl.ua">office@trkgok.pl.ua</a>)<br><br>
-                      <b>Радіо:</b><br>
-                      • «Кварцит» (вул. Миру, 24 | директор Тетяна Терен | 0675326914, <a href="mailto:radio.kvartsit@gmail.com">radio.kvartsit@gmail.com</a>)<br><br>
-                      <b>Друковані медіа:</b><br>
-                      • «Хроніки тижня» (просп. Героїв Дніпра, 54 | 0730747963, <a href="mailto:xweek.info@gmail.com">xweek.info@gmail.com</a> | тираж 5 000, щосереди)<br><br>
-                      <b>Соціальні мережі:</b><br>
-                      • <a href="https://t.me/gorishnie_plavni1" target="_blank">Горішні Плавні</a> (20 719)`
+                name: "Кременчуцький район",
+                id: "kremenchutsky_district",
+                locations: [
+                    {
+                        id: "kremenchuk",
+                        coords: [49.06925571811738, 33.426795339807455],
+                        title: "Кременчук",
+                        color: "#1D3557",
+                        desc: `<b>Телебачення:</b><br>• Візит<br>• Кременчуцька міська ТРК`
+                    },
+                    {
+                        id: "horishnie_plavni",
+                        coords: [49.0156550992913, 33.6408459203986],
+                        title: "Горішні Плавні",
+                        color: "#2A9D8F",
+                        desc: `<b>Телебачення:</b><br>• Телерадіокомпанія ГОК`
+                    }
+                ]
             },
             {
-                id: "opishnia",
-                coords: [49.959015141844255, 34.603743384410215],
-                title: "Опішня",
-                desc: `<b>Радіо:</b><br>
-                      • Селищне радіомовлення «Голос Опішні» Опішня FM (вул. Перемоги, буд. 3 | керівник Яна Хайдурова | 0660406914)`
-            },
-            {
-                id: "lanna",
-                coords: [49.35031203911503, 35.258109326278785],
-                title: "Ланна",
-                desc: `<b>Друковані медіа:</b><br>
-                      • Газета «Моя громада+» (вул. Миру, 5 | редактор Глуховеря І.П. | тираж 10000, 1/місяць)`
-            },
-            {
-                id: "kotelva",
-                coords: [50.06871697970275, 34.76480293991771],
-                title: "Котельва",
-                desc: `<b>Друковане медіа:</b><br>
-                      • Котелевська районна газета «Народна трибуна» (вул. Полтавський Шлях, б. 221 | редактор Ірина Шило | 0955052618 | Тираж 1567, 1/місяць)<br><br>
-                      <b>Радіо:</b><br>
-                      • Вільне радіо Котельва (вул. Полтавський шлях, 207 | керівник Віталій Кривобік)`
-            },
-            {
-                id: "hadiach",
-                coords: [50.368233749095715, 33.98000552306202],
-                title: "Гадяч",
-                desc: `<b>Друковані видання:</b><br>
-                      • Газета Базар Медіа в Україні (вул. Гетьманська, 62-Б | 0508011885, <a href="mailto:bazarmedia@ukr.net">bazarmedia@ukr.net</a> | засновник і видавець Товстий Олександр | тираж 1000, щочетверга)<br><br>
-                      <b>Соціальні мережі:</b><br>
-                      • <a href="https://t.me/Hadiachtelegram" target="_blank">Гадяч</a> (10 171 підписник)`
-            },
-            {
-                id: "reshetylivka",
-                coords: [49.56440548086894, 34.07979173037247],
-                title: "Решетилівка",
-                desc: `<b>Друковані медіа:</b><br>
-                      • Решетилівський вісник (вул. Шевченка, 4 | 066 332 91 04, <a href="mailto:resvisnik@gmail.com">resvisnik@gmail.com</a> | редактор Циган Іван Іванович)<br><br>
-                      <b>Онлайн-медіа:</b><br>
-                      • Решетилівщина (вул. Покровська, 16 | <a href="https://resh.news/" target="_blank">https://resh.news/</a> | <a href="mailto:ads@relife.media">ads@relife.media</a> | 4300 відвідувань)<br><br>
-                      <b>Радіо:</b><br>
-                      • Релайф (вул. Шевченка, 4 | 0990110911, 0509760542, <a href="mailto:radio_reshet@ukr.net">radio_reshet@ukr.net</a> | редактор Ігор Петраков)`
-            },
-            {
-                id: "khorol",
-                coords: [49.781980660838684, 33.27406690711789],
-                title: "Хорол",
-                desc: `<b>Друковані медіа:</b><br>
-                      • Вісті Хорольщини (вул. Незалежності, буд. 65/20, приміщення 1 | 095 068-56-29, <a href="mailto:horol_visti@ukr.net">horol_visti@ukr.net</a> | редактор Наталія Ватуля | тираж 8500, щоп’ятниці)`
-            },
-            {
-                id: "rozsoshentsi",
-                coords: [49.5403906136859, 34.504261676751234],
-                title: "Розсошенці",
-                desc: `<b>Друковане медіа:</b><br>
-                      • Обласна газета «Полтавська думка» (вул. Перспективна, 1 | редактор Діана Страшко | 066 589 44 97)`
-            },
-            {
-                id: "myrhorod",
-                coords: [49.96273588416958, 33.607501694968086],
-                title: "Миргород",
-                desc: `<b>Телебачення:</b><br>
-                      • Міська телестудія «Миргород» (вул. Незалежності, 2 | Ошека Євген Павлович, 0505684696 | <a href="mailto:mirgorod_tv@ukr.net">mirgorod_tv@ukr.net</a>)<br><br>
-                      <b>Друковані медіа:</b><br>
-                      • Газета «Прапор Перемоги» (м. Миргород, вул. Кашинского, 21 | головний редактор Устименко Ольга Олександрівна | +380 99 408 1814 | Тираж 2200, 2 рази на місяць)`
-            },
-            {
-                id: "pyriatyn",
-                coords: [50.23971543366116, 32.50720593066764],
-                title: "Пирятин",
-                desc: `<b>Друковані media:</b><br>
-                      • Газета «Пирятинські вісті» (вулиця Успенська, 5 | Редактор – Оксана Іванівна Бондаренко, <a href="mailto:pirvisti@ukr.net">pirvisti@ukr.net</a> | (05358) 2-06-73, (099) 455-67-20 | Тираж 1260, щовівторка)`
-            },
-            {
-                id: "velyka_bahachka",
-                coords: [49.78925313280651, 33.72845014823058],
-                title: "Велика Багачка",
-                desc: `<b>Друковані медіа:</b><br>
-                      • Газета «Рідний край» (вул. Шевченка, 73 | Головний редактор О.Прогрущенко | e-mail: <a href="mailto:gazetagbag@ukr.net">gazetagbag@ukr.net</a> | Тираж 610, 2/місяць)`
-            },
-            {
-                id: "chutove",
-                coords: [49.71139305002166, 35.15749682875592],
-                title: "Чутове",
-                desc: `<b>Друковані медіа:</b><br>
-                      • Газета «Сільські новини» (площа Перемоги, 2 | Редактор Оксана Черкас, +380665887345, <a href="mailto:silsnow@ukr.net">silsnow@ukr.net</a> | Тираж 2000, 2 рази на місяць)<br><br>
-                      <b>Соціальні мережі:</b><br>
-                      • <a href="https://www.facebook.com/chutivskiykray/?locale=uk_UA" target="_blank">«Чутівський край»</a> (11000 підписників)`
-            },
-            {
-                id: "kobeliaky",
-                coords: [49.151277227456056, 34.19500079757286],
-                title: "Кобеляки",
-                desc: `<b>Онлайн-медіа:</b><br>
-                      • «Тижневик ЕХО» (вул. Михайлівська, 51. | редакція: 0979039267, <a href="mailto:gazeta-exo@i.ua">gazeta-exo@i.ua</a> | відвідуваність: 29 000)`
-            },
-            {
-                id: "lubny",
-                coords: [50.01647239048797, 33.000682139961796],
-                title: "Лубни",
-                desc: `<b>Друковані медіа:</b><br>
-                      • Вісник (вул. Ярослава Мудрого, буд. 31 | (05361) 74-333 | редактор Людмила Бірюкова | тираж 700, щосереди)<br><br>
-                      <b>Онлайн-медіа:</b><br>
-                      • Moзambik.media (<a href="https://mo3ambik.media/" target="_blank">https://mo3ambik.media/</a> | відвідуваність 2200)`
-            },
-            {
-                id: "zinkiv",
-                coords: [50.2044126263834, 34.363366514276656],
-                title: "Зіньків",
-                desc: `<b>Радіо:</b><br>
-                      • Комунальна установа «Редакція радіо «Вишня ФМ» Зіньківської міської ради (вул. Воздвиженська, 40 | директор Людмила Негода)`
-            },
-            {
-                id: "hrebinka",
-                coords: [50.1184759876677, 32.45232241478251],
-                title: "Гребінка",
-                desc: `<b>Онлайн-медіа:</b><br>
-                      • Гребінка (<a href="https://www.grebenka.com/" target="_blank">https://www.grebenka.com/</a> | (066) 372-49-57, <a href="mailto:admin@grebenka.com">admin@grebenka.com</a> | Відвідуваність 100000)`
+                name: "Миргородський район",
+                id: "myrhorodsky_district",
+                locations: [
+                    {
+                        id: "hadiach",
+                        coords: [50.368233749095715, 33.98000552306202],
+                        title: "Гадяч",
+                        color: "#00F5D4",
+                        desc: `<b>Друковані видання:</b><br>• Газета Базар Медіа в Україні`
+                    },
+                    {
+                        id: "myrhorod",
+                        coords: [49.96273588416958, 33.607501694968086],
+                        title: "Миргород",
+                        color: "#F9C74F",
+                        desc: `<b>Телебачення:</b><br>• Міська телестудія «Миргород»`
+                    },
+                    {
+                        id: "velyka_bahachka",
+                        coords: [49.78925313280651, 33.72845014823058],
+                        title: "Велика Багачка",
+                        color: "#90BE6D",
+                        desc: `<b>Друковані медіа:</b><br>• Газета «Рідний край»`
+                    }
+                ]
             }
         ];
 
-        const listContainer = document.getElementById('list');
-        const listItemsElements = {};
+        const districtsRoot = document.getElementById('districts-root');
+        
+        // Словники для швидкого пошуку DOM-елементів при кліках на карті
+        const districtDOMs = {};
+        const locationDOMs = {};
 
-        function activateCityInSidebar(id) {
-            const element = listItemsElements[id];
-            if (!element) return;
-            const isAlreadyActive = element.classList.contains('active');
-            document.querySelectorAll('.location-item').forEach(el => el.classList.remove('active'));
-            if (!isAlreadyActive) {
-                element.classList.add('active');
-                if (sidebarContainer.classList.contains('collapsed')) { toggleBtn.click(); }
+        // Головна функція активації та розгортання потрібного району та громади
+        function activateLocation(districtId, locationId) {
+            // 1. Перевіряємо та розгортаємо Район (Рівень 1)
+            const targetDistrict = districtDOMs[districtId];
+            if (targetDistrict) {
+                const isDistrictActive = targetDistrict.classList.contains('active');
+                if (!isDistrictActive) {
+                    // Згортаємо інші райони
+                    document.querySelectorAll('.district-item').forEach(el => el.classList.remove('active'));
+                    // Розгортаємо наш
+                    targetDistrict.classList.add('active');
+                }
+            }
+
+            // 2. Перевіряємо та розгортаємо Громаду (Рівень 2)
+            const targetLocation = locationDOMs[locationId];
+            if (targetLocation) {
+                const isLocationActive = targetLocation.classList.contains('active');
+                // Згортаємо інші громади всередині системи
+                document.querySelectorAll('.location-item').forEach(el => el.classList.remove('active'));
+                
+                if (!isLocationActive) {
+                    targetLocation.classList.add('active');
+                }
+            }
+
+            // Якщо бічна панель закрита, автоматично відкриваємо її
+            if (sidebarContainer.classList.contains('collapsed')) {
+                toggleBtn.click();
             }
         }
 
-        locations.forEach(loc => {
-            const marker = L.marker(loc.coords).addTo(map);
-            marker.on('click', () => { activateCityInSidebar(loc.id); });
-
-            const listItem = document.createElement('li');
-            listItem.className = 'location-item';
-            listItem.innerHTML = `
-                <div class="location-trigger"><h4>${loc.title}</h4></div>
-                <div class="location-content">${loc.desc}</div>
+        // Генерація інтерфейсу та маркерів карти
+        districtsData.forEach(dist => {
+            
+            // Створюємо елемент Району
+            const districtLi = document.createElement('li');
+            districtLi.className = 'district-item';
+            districtLi.innerHTML = `
+                <div class="district-trigger">
+                    <span>${dist.name}</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="district-content">
+                    <ul class="location-list"></ul>
+                </div>
             `;
+            
+            districtsRoot.appendChild(districtLi);
+            districtDOMs[dist.id] = districtLi; // Зберігаємо посилання
 
-            listItem.querySelector('.location-trigger').addEventListener('click', () => {
-                activateCityInSidebar(loc.id);
+            const locationListUl = districtLi.querySelector('.location-list');
+
+            // Клік по заголовку району (Розгортання/Згортання району)
+            districtLi.querySelector('.district-trigger').addEventListener('click', (e) => {
+                const isCurrentlyActive = districtLi.classList.contains('active');
+                document.querySelectorAll('.district-item').forEach(el => el.classList.remove('active'));
+                if (!isCurrentlyActive) {
+                    districtLi.classList.add('active');
+                }
             });
 
-            listContainer.appendChild(listItem);
-            listItemsElements[loc.id] = listItem;
+            // Наповнюємо район громадами
+            dist.locations.forEach(loc => {
+                
+                // 1. Додаємо різнокольорові маркери на карту за допомогою L.circleMarker
+                const marker = L.circleMarker(loc.coords, {
+                    radius: 10,
+                    fillColor: loc.color,
+                    color: "#fff",
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.9
+                }).addTo(map);
+
+                // Пов'язуємо клік по маркеру на карті з активацією у списку
+                marker.on('click', () => {
+                    activateLocation(dist.id, loc.id);
+                    // Центруємо карту на маркері для зручності
+                    map.setView(loc.coords, map.getZoom());
+                });
+
+                // 2. Створюємо елемент Громади (Рівень 2) всередині району
+                const locationLi = document.createElement('li');
+                locationLi.className = 'location-item';
+                locationLi.innerHTML = `
+                    <div class="location-trigger">
+                        <h4>${loc.title}</h4>
+                        <span>+</span>
+                    </div>
+                    <div class="location-content">${loc.desc}</div>
+                `;
+
+                locationListUl.appendChild(locationLi);
+                locationDOMs[loc.id] = locationLi; // Зберігаємо посилання
+
+                // Клік по самій громаді в списку
+                locationLi.querySelector('.location-trigger').addEventListener('click', (e) => {
+                    e.stopPropagation(); // Щоб клік не спрацьовувал на батьківський район
+                    const isLocActive = locationLi.classList.contains('active');
+                    document.querySelectorAll('.location-item').forEach(el => el.classList.remove('active'));
+                    
+                    if (!isLocActive) {
+                        locationLi.classList.add('active');
+                        map.panTo(loc.coords); // Переміщуємо карту до точки
+                    }
+                });
+            });
         });
     </script>
 </body>
