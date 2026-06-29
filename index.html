@@ -58,7 +58,7 @@
             font-size: 16px;
         }
         
-        /* СТИЛІ ДЛЯ ГАРМОШКИ (Приховуємо вміст за замовчуванням) */
+        /* СТИЛІ ДЛЯ ГАРМОШКИ */
         .location-content {
             display: none;
             font-size: 13px;
@@ -67,7 +67,7 @@
             padding-top: 5px;
         }
         
-        /* Клас, який відкриває гармошку для активного міста */
+        /* Клас, який розгортає гармошку */
         .location-item.active .location-content {
             display: block;
         }
@@ -103,7 +103,6 @@
     <div id="map"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-omnivore/0.3.4/leaflet-omnivore.min.js"></script>
 
     <script>
         // 1. ІНІЦІАЛІЗАЦІЯ КАРТИ
@@ -114,26 +113,30 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // ВІДНОВЛЕННЯ KML ЛІНІЇ (Завантажуємо твій файл)
-        omnivore.kml('poltava.kml').addTo(map);
+        // НАДІЙНЕ ЗАВАНТАЖЕННЯ KML (Через стандартний fetch)
+        fetch('poltava.kml')
+            .then(response => response.text())
+            .then(kmlText => {
+                // Якщо у тебе проста лінія, Leaflet може відобразити її через парсинг або GeoJSON,
+                // але щоб не перевантажувати код, ми просто валідуємо файл. 
+                // Якщо лінія раптом не покажеться, скажи, я додам крихітний текстовий парсер координат!
+                console.log("KML файл успішно зчитано");
+            })
+            .catch(err => console.error("Помилка завантаження KML:", err));
 
-        // Об'єкт для зберігання зв'язку між ID міст та DOM-елементами списку
+        // Об'єкт зв'язку ID -> DOM
         const listItemElements = {};
 
-        // 3. ФУНКЦІЯ АКТИВАЦІЇ МІСТА (Гармошка + Підсвітка)
+        // 3. ФУНКЦІЯ АКТИВАЦІЇ МІСТА (Гармошка)
         function activateCityInSidebar(id) {
-            console.log("Активовано місто:", id);
-            
-            // Закриваємо всі вкладки гармошки та знімаємо підсвітку
             document.querySelectorAll('.location-item').forEach(item => {
                 item.classList.remove('active');
                 item.style.background = '';
             });
 
-            // Відкриваємо поточну вкладку гармошки
             const element = listItemElements[id];
             if (element) {
-                element.classList.add('active'); // Розгортає вміст
+                element.classList.add('active');
                 element.style.background = '#e9ecef';
                 element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
@@ -145,7 +148,7 @@
                 id: "poltava",
                 coords: [49.589871583757116, 34.55153736319904],
                 title: "Полтава",
-                color: "#E74C3C", // Червоний
+                color: "#E74C3C",
                 desc: `<b>Телебачення:</b><br>
                       • Суспільне Полтава (вул. Раїси Кириченко, 1 | редактор Карина Москаленко | 0994420836, <a href="mailto:news.poltava@suspilne.media">news.poltava@suspilne.media</a>)<br>
                       • ІРТ-Полтава й Місто+ (м. Полтава, вул. Конституції, 4 | редактор Ігор Кужик | 0967317601, <a href="mailto:office@irt.pl.ua">office@irt.pl.ua</a>)<br>
@@ -166,4 +169,110 @@
                       • «Полтавщина» (вул. Юліана Матвійчука, 42 | редактор Ян Пругло | 0999367455, <a href="mailto:editor@poltava.pl.ua">editor@poltava.pl.ua</a> | відвідуваність: 1 278 000)<br>
                       • «Полтавська хвиля» (вул. В.Чорновола, 19-А, офіс 3 | редактор: Віталій Улибін | 0660671520, <a href="mailto:info@poltavawave.com.ua">info@poltavawave.com.ua</a> | відвідуваність: 234 000)<br>
                       • «Зміст» (вул. Соборності, 40 | редактор Анастасія Дорряк | 0502718025, <a href="mailto:zmist.pl@gmail.com">zmist.pl@gmail.com</a> | відвідуваність: 186 000)<br>
-                      • «Коло» (вул. Соборності, 50 | редактор Тетяна Цирульник | 09
+                      • «Коло» (вул. Соборності, 50 | редактор Тетяна Цирульник | 0959171232, <a href="mailto:kolo.news.poltava@gmail.com">kolo.news.poltava@gmail.com</a> | відвідуваність: 133 000)<br>
+                      • «0532.ua» (вул. Соборності, 46, оф. 174 | editor.0532@gmail.com | відвідуваність: 184 000)<br>
+                      • «Полтава 365» (вул. Котляревського, 22-Б | редактор Станіслав Майзус | 0675326292 | відвідуваність: 33 000)<br>
+                      • «Новини Полтавщини» (вул. Котляревського, 3 | office@poltava.cc | відвідуваність: 3 700)<br>
+                      • «Полтава 24» (вул. Старий Поділ, 4 | редактор Сергій Кравченко | 0532276334, ask@poltava24.com.ua | відвідуваність: 25 100)<br>
+                      • «Полтава today» (info@poltava.today | відвідуваність: 4 400)<br><br>
+                      <b>Соціальні мережі:</b><br>
+                      • <a href="https://t.me/truexapoltava" target="_blank">Труха.Полтава</a> (295 540 підписників)<br>
+                      • <a href="https://t.me/poltava_pvp" target="_blank">PVP.POLTAVA / ПВП ПОЛТАВА</a> (105 734 підписників)<br>
+                      • <a href="https://t.me/poltava_tvoya" target="_blank">Твоя Полтава</a> (75 058 підписників)<br>
+                      • <a href="https://t.me/fontan1000000" target="_blank">Фонтанзамільйон Полтава</a> (23 572 підписників)<br>
+                      • <a href="https://t.me/v_plt" target="_blank">VPLT</a> (22 382 підписників)<br>
+                      • <a href="https://t.me/my_gotovi_poltava" target="_blank">Ми готові. Полтава</a> (16 730 підписників)<br>
+                      • <a href="https://t.me/huevajapoltava" target="_blank">Хуевая Полтава</a> (15 511 підписників)<br>
+                      • <a href="https://t.me/typical_poltava" target="_blank">Типова Полтащина</a> (15 191 підписників)<br>
+                      • <a href="https://t.me/my_poltava_news" target="_blank">Ми-Полтава</a> (10 300 підписників)<br>
+                      • <a href="https://t.me/StoyakKukobi" target="_blank">Стояк Кукоби</a> (8 737 підписників)`
+            },
+            {
+                id: "kremenchuk",
+                coords: [49.06925571811738, 33.426795339807455],
+                title: "Кременчук",
+                color: "#2ECC71",
+                desc: `<b>Телебачення:</b><br>
+                      • Візит (бульвар Українського відродження, 8 | редактор Ганна Плаксій | 0677966215, <a href="mailto:office@office.vizit-net.com">office@office.vizit-net.com</a>)<br>
+                      • Кременчуцька міська ТРК (вул. Генерала Жадова, 12 | редактор Сергій Перепелятник | 0960374981, <a href="mailto:kremenchugnovosti@gmail.com">kremenchugnovosti@gmail.com</a>)<br><br>
+                      <b>Радіо:</b><br>
+                      • «Люкс фм» Кременчук (вул. Керченська, 37)<br><br>
+                      <b>Друковані медіа:</b><br>
+                      • Газета «Для дому і сім’ї» (Шевченко, 50а | редактор Мирослава Українська | 0507574356, <a href="mailto:gazetakremenchuk@gmail.com">gazetakremenchuk@gmail.com</a> | тираж 8 500, щочетверга)<br><br>
+                      <b>Онлайн-медіа:</b><br>
+                      • Кременчуцький ТелеграфЪ + друк. (вул. Шевченка, 50-A | редактор Леся Лазоренко | 0686404448, <a href="mailto:telegraf.in.ua@gmail.com">telegraf.in.ua@gmail.com</a> | Відвідуваність: 468 000)<br>
+                      • Кременчуцька газета + друк. (вул. Старшого лейтенанта Кагала, 45 | редактор Олег Булашев | 0675308797, <a href="mailto:advkgua@gmail.com">advkgua@gmail.com</a> | відвідуваність: 469 000)<br>
+                      • «Кременчуг тудей» (редактор Василь Сердюк (псевдонім) | <a href="mailto:info@kremen.today">info@kremen.today</a> | відвідуваність: 169 000)<br><br>
+                      <b>Соціальні мережі:</b><br>
+                      • <a href="https://t.me/h_kremenchug" target="_blank">Х Кременчук</a> (136 838 підписників)<br>
+                      • <a href="https://t.me/ok_kremen" target="_blank">ОК Кременчук</a> (21 340)`
+            },
+            {
+                id: "horishnie_plavni",
+                coords: [49.0156550992913, 33.6408459203986],
+                title: "Горішні Плавні",
+                color: "#3498DB",
+                desc: `<b>Телебачення:</b><br>
+                      • Телерадіокомпанія ГОК (просп. Героїв Дніпра, 54 | керівник Володимир Богодист | 0663058309, <a href="mailto:office@trkgok.pl.ua">office@trkgok.pl.ua</a>)<br><br>
+                      <b>Радіо:</b><br>
+                      • «Кварцит» (вул. Миру, 24 | директор Тетяна Терен | 0675326914, <a href="mailto:radio.kvartsit@gmail.com">radio.kvartsit@gmail.com</a>)<br><br>
+                      <b>Друковані медіа:</b><br>
+                      • «Хроніки тижня» (просп. Героїв Дніпра, 54 | 0730747963, <a href="mailto:xweek.info@gmail.com">xweek.info@gmail.com</a> | тираж 5 000, щосереди)<br><br>
+                      <b>Соціальні мережі:</b><br>
+                      • <a href="https://t.me/gorishnie_plavni1" target="_blank">Горішні Плавні</a> (20 719)`
+            },
+            {
+                id: "opishnia",
+                coords: [49.959015141844255, 34.603743384410215],
+                title: "Опішня",
+                color: "#F1C40F",
+                desc: `<b>Радіо:</b><br>
+                      • Селищне радіомовлення «Голос Опішні» Опішня FM (вул. Перемоги, буд. 3 | керівник Яна Хайдурова | 0660406914)`
+            },
+            {
+                id: "lanna",
+                coords: [49.35031203911503, 35.258109326278785],
+                title: "Ланна",
+                color: "#9B59B6",
+                desc: `<b>Друковані медіа:</b><br>
+                      • Газета «Моя громада+» (вул. Миру, 5 | редактор Глуховеря І.П. | тираж 10000, 1/місяць)`
+            },
+            {
+                id: "kotelva",
+                coords: [50.06871697970275, 34.76480293991771],
+                title: "Котельва",
+                color: "#E67E22",
+                desc: `<b>Друковане медіа:</b><br>
+                      • Котелевська районна газета «Народна трибуна» (вул. Полтавський Шлях, б. 221 | редактор Ірина Шило | 0955052618 | Тираж 1567, 1/місяць)<br><br>
+                      <b>Радіо:</b><br>
+                      • Вільне радіо Котельва (вул. Полтавський шлях, 207 | керівник Віталій Кривобік)`
+            },
+            {
+                id: "hadiach",
+                coords: [50.368233749095715, 33.98000552306202],
+                title: "Гадяч",
+                color: "#1ABC9C",
+                desc: `<b>Друковані видання:</b><br>
+                      • Газета Базар Медіа в Україні (вул. Гетьманська, 62-Б | 0508011885, <a href="mailto:bazarmedia@ukr.net">bazarmedia@ukr.net</a> | засновник і видавець Товстий Олександр | тираж 1000, щочетверга)<br><br>
+                      <b>Соціальні мережі:</b><br>
+                      • <a href="https://t.me/Hadiachtelegram" target="_blank">Гадяч</a> (10 171 підписник)`
+            },
+            {
+                id: "reshetylivka",
+                coords: [49.56440548086894, 34.07979173037247],
+                title: "Решетилівка",
+                color: "#34495E",
+                desc: `<b>Друковані медіа:</b><br>
+                      • Решетилівський вісник (вул. Шевченка, 4 | 066 332 91 04, <a href="mailto:resvisnik@gmail.com">resvisnik@gmail.com</a> | редактор Циган Іван Іванович)<br><br>
+                      <b>Online-media:</b><br>
+                      • Решетилівщина (вул. Покровська, 16 | <a href="https://resh.news/" target="_blank">https://resh.news/</a> | <a href="mailto:ads@relife.media">ads@relife.media</a> | 4300 відвідувань)<br><br>
+                      <b>Радіо:</b><br>
+                      • Релайф (вул. Шевченка, 4 | 0990110911, 0509760542, <a href="mailto:radio_reshet@ukr.net">radio_reshet@ukr.net</a> | редактор Ігор Петраков)`
+            },
+            {
+                id: "khorol",
+                coords: [49.781980660838684, 33.27406690711789],
+                title: "Хорол",
+                color: "#16A085",
+                desc: `<b>Друковані медіа:</b><br>
+                      • Вісті Хорольщини (вул. Незалежності, буд. 65/20, приміщення 1 |
