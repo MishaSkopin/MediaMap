@@ -126,6 +126,40 @@
             padding: 15px 20px;
             border-top: 1px solid #e2e8f0;
         }
+        /* Стиль для кольорових класичних крапель */
+.custom-pin-marker {
+    background: none !important;
+    border: none !important;
+}
+
+.marker-pin {
+    width: 25px;
+    height: 41px;
+    background-image: url('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+/* Робимо точне фарбування через маску, щоб кольори з JS збігалися на 100% */
+.marker-pin::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 25px;
+    height: 41px;
+    background-image: url('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: var(--marker-color);
+    background-blend-mode: multiply;
+    -webkit-mask-image: url('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png');
+    mask-image: url('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    mix-blend-mode: color;
+}
     </style>
 </head>
 <body>
@@ -394,17 +428,18 @@ const locations = [
         }
 
 locations.forEach(loc => {
-    // Створюємо кольоровий круговий маркер замість стандартної синьої краплі
-    const marker = L.circleMarker(loc.coords, {
-        radius: 8,               // Розмір кружечка
-        fillColor: loc.color,    // Твій унікальний колір з масиву
-        color: "#ffffff",        // Біла обводка, щоб маркер виділявся
-        weight: 2,               // Товщина обводки
-        opacity: 1,
-        fillOpacity: 0.9         // Прозорість заливки
+    // Створюємо стандартну краплю, яка передає свій унікальний колір у CSS
+    const marker = L.marker(loc.coords, {
+        icon: L.divIcon({
+            className: 'custom-pin-marker',
+            html: `<div class="marker-pin" style="--marker-color: ${loc.color};"></div>`,
+            iconSize: [25, 41],
+            iconAnchor: [12, 41]
+        })
     }).addTo(map);
 
-    marker.on('click', () => { activateCityInsidebar(loc.id); });
+    // Виправлено регістр літери "B" у назві функції
+    marker.on('click', () => { activateCityInSidebar(loc.id); });
 
     const listItem = document.createElement('li');
     listItem.className = 'location-item';
@@ -413,8 +448,9 @@ locations.forEach(loc => {
         <div class="location-content">${loc.desc}</div>
     `;
 
+    // Тут також виправлено на activateCityInSidebar
     listItem.querySelector('.location-trigger').addEventListener('click', () => {
-        activateCityInsidebar(loc.id);
+        activateCityInSidebar(loc.id);
     });
 
     listContainer.appendChild(listItem);
