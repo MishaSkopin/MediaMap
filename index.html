@@ -236,11 +236,12 @@
             background-color: #e8f0fe;
         }
 
-        .location-item.active .location-content {
+.location-item.active .location-content {
             max-height: 3000px;
             padding: 15px 20px;
             border-top: 1px solid #e2e8f0;
             overflow-y: auto;
+            transition: none !important; /* Прибираємо анімацію ТІЛЬКИ для вже відкритого стану, щоб воно не смикалося при фільтрації */
         }
 
         .media-group-title {
@@ -339,16 +340,17 @@
             });
         } catch(e) { console.log(e); }
 
-        const state = {
-            searchQuery: "",
-            filters: {
-                tv: true,
-                radio: true,
-                print: true,
-                online: true,
-                social: true
-            }
-        };
+      const state = {
+    searchQuery: "",
+    filters: {
+        tv: true,
+        radio: true,
+        print: true,
+        online: true,
+        social: true
+    },
+    activeLocationId: null // <-- Додали сюди збереження відкритого міста
+};
 
         // База даних
         const hierarchyData = [
@@ -758,13 +760,15 @@
 
             return hasData ? html : null;
         }
+function activateCityInSidebar(districtId, locationId, cityCoords = null) {
+    state.activeLocationId = locationId; // <-- Запам'ятовуємо, яке місто зараз відкрили
 
-        function activateCityInSidebar(districtId, locationId, cityCoords = null) {
-            const distEl = districtElements[districtId];
-            if (distEl && !distEl.classList.contains('active')) {
-                document.querySelectorAll('.district-item').forEach(el => el.classList.remove('active'));
-                distEl.classList.add('active');
-            }
+    const distEl = districtElements[districtId];
+    if (distEl && !distEl.classList.contains('active')) {
+        document.querySelectorAll('.district-item').forEach(el => el.classList.remove('active'));
+        distEl.classList.add('active');
+    }
+    // ... весь інший код функції залишається без змін ...
 
             const locEl = locationElements[locationId];
             if (locEl) {
@@ -826,8 +830,13 @@
                     
                     marker.on('click', () => { activateCityInSidebar(dist.id, loc.id, null); });
 
-                    const listItem = document.createElement('li');
+const listItem = document.createElement('li');
                     listItem.className = 'location-item';
+                    
+                    // Перевіряємо, чи було це місто відкритим до перемальовування
+                    if (state.activeLocationId === loc.id) {
+                        listItem.className = 'location-item active';
+                    }
                     
                     listItem.innerHTML = `
                         <div class="location-trigger"><h4>${highlightText(loc.title, query)}</h4></div>
@@ -836,7 +845,13 @@
 
                     listItem.querySelector('.location-trigger').addEventListener('click', (e) => {
                         e.stopPropagation();
-                        activateCityInSidebar(dist.id, loc.id, loc.coords);
+                        // Якщо клікнули на вже відкрите місто — згортаємо його
+                        if (state.activeLocationId === loc.id) {
+                            state.activeLocationId = null;
+                            listItem.classList.remove('active');
+                        } else {
+                            activateCityInSidebar(dist.id, loc.id, loc.coords);
+                        }
                     });
 
                     locationListUl.appendChild(listItem);
