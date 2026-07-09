@@ -598,14 +598,56 @@
     }
 ];
 
-        // 5. Кнопка згортання панелі
+// 3. Кнопка згортання панелі та жест свайпу (swipe)
         const sidebarContainer = document.getElementById('sidebar-container');
         const toggleBtn = document.getElementById('toggle-btn');
 
-        toggleBtn.addEventListener('click', () => {
-            sidebarContainer.classList.toggle('collapsed');
+        // Функція для перемикання стану сайдбару
+        function toggleSidebar(forceCollapse) {
+            if (typeof forceCollapse === 'boolean') {
+                if (forceCollapse) {
+                    sidebarContainer.classList.add('collapsed');
+                } else {
+                    sidebarContainer.classList.remove('collapsed');
+                }
+            } else {
+                sidebarContainer.classList.toggle('collapsed');
+            }
             toggleBtn.innerText = sidebarContainer.classList.contains('collapsed') ? '›' : '‹';
-        });
+        }
+
+        // Клік по кнопці
+        toggleBtn.addEventListener('click', toggleSidebar);
+
+        // --- ДОДАВАННЯ ЖЕСТІВ СВАЙПУ ---
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        // Фіксуємо координату, де палець торкнувся екрана
+        sidebarContainer.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        // Фіксуємо координату, де палець відірвався від екрана
+        sidebarContainer.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const swipeDistance = touchEndX - touchStartX;
+            const minSwipeDistance = 50; // Мінімальна довжина свайпу в пікселях, щоб уникнути випадкових мікро-рухів
+
+            // Свайп справа наліво (закриваємо сайдбар)
+            if (swipeDistance < -minSwipeDistance) {
+                toggleSidebar(true);
+            }
+            
+            // Свайп зліва направо (відкриваємо сайдбар)
+            if (swipeDistance > minSwipeDistance) {
+                toggleSidebar(false);
+            }
+        }
 
         // Елементи інтерфейсу для швидкого доступу
         const districtElements = {};
