@@ -236,12 +236,12 @@
             background-color: #e8f0fe;
         }
 
-.location-item.active .location-content {
+        .location-item.active .location-content {
             max-height: 3000px;
             padding: 15px 20px;
             border-top: 1px solid #e2e8f0;
             overflow-y: auto;
-            transition: none !important; /* Прибираємо анімацію ТІЛЬКИ для вже відкритого стану, щоб воно не смикалося при фільтрації */
+            transition: none !important; /* Прибираємо анімацію для відкритого стану, щоб не смикалося при кліку на чекбокси */
         }
 
         .media-group-title {
@@ -260,27 +260,28 @@
             padding: 0 2px;
             border-radius: 2px;
         }
+
         /* ВИПРАВЛЕННЯ ДЛЯ БЛОКУ ФІЛЬТРАЦІЇ НА МОБІЛЬНИХ */
-@media (max-width: 480px) {
-    .search-filter-box {
-        padding: 0 15px 12px 15px; /* Трохи зменшуємо внутрішні відступи */
-    }
+        @media (max-width: 480px) {
+            .search-filter-box {
+                padding: 0 15px 12px 15px;
+            }
 
-    .search-input {
-        padding: 6px 12px;
-        font-size: 14px;
-        margin-bottom: 8px;
-    }
+            .search-input {
+                padding: 6px 12px;
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
 
-    .filters-container {
-        font-size: 12px; /* Робимо шрифт чекбоксів трохи меншим, щоб тексти поміщалися в один рядок */
-        gap: 4px;        /* Зменшуємо відстань між чекбоксами */
-    }
-    
-    .filter-label {
-        gap: 6px;        /* Зменшуємо відстань між самим квадратиком чекбокса і текстом */
-    }
-}
+            .filters-container {
+                font-size: 12px;
+                gap: 4px;
+            }
+            
+            .filter-label {
+                gap: 6px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -292,16 +293,13 @@
             <h2 class="sidebar-header">ЗМІ Полтавщини</h2>
             
             <div class="search-filter-box">
-                <!-- Глобальний пошук -->
                 <input type="text" id="search-box" class="search-input" placeholder="Шукайте місто, ЗМІ, прізвище, тел...">
                 
-                <!-- Кнопка-спойлер фільтру за типами -->
                 <button type="button" id="spoiler-btn" class="filter-spoiler-btn">
                     <span>Фільтрувати за типом медіа</span>
                     <span id="spoiler-arrow">▼</span>
                 </button>
 
-                <!-- Прихований блок фільтрів -->
                 <div id="filters-wrapper" class="filters-wrapper">
                     <div class="filters-container">
                         <label class="filter-label"><input type="checkbox" id="filter-tv" checked> Телебачення</label>
@@ -340,17 +338,17 @@
             });
         } catch(e) { console.log(e); }
 
-      const state = {
-    searchQuery: "",
-    filters: {
-        tv: true,
-        radio: true,
-        print: true,
-        online: true,
-        social: true
-    },
-    activeLocationId: null // <-- Додали сюди збереження відкритого міста
-};
+        const state = {
+            searchQuery: "",
+            filters: {
+                tv: true,
+                radio: true,
+                print: true,
+                online: true,
+                social: true
+            },
+            activeLocationId: null // Зберігаємо ID відкритого міста
+        };
 
         // База даних
         const hierarchyData = [
@@ -760,15 +758,15 @@
 
             return hasData ? html : null;
         }
-function activateCityInSidebar(districtId, locationId, cityCoords = null) {
-    state.activeLocationId = locationId; // <-- Запам'ятовуємо, яке місто зараз відкрили
 
-    const distEl = districtElements[districtId];
-    if (distEl && !distEl.classList.contains('active')) {
-        document.querySelectorAll('.district-item').forEach(el => el.classList.remove('active'));
-        distEl.classList.add('active');
-    }
-    // ... весь інший код функції залишається без змін ...
+        function activateCityInSidebar(districtId, locationId, cityCoords = null) {
+            state.activeLocationId = locationId; // Запам'ятовуємо, яке місто відкрили
+
+            const distEl = districtElements[districtId];
+            if (distEl && !distEl.classList.contains('active')) {
+                document.querySelectorAll('.district-item').forEach(el => el.classList.remove('active'));
+                distEl.classList.add('active');
+            }
 
             const locEl = locationElements[locationId];
             if (locEl) {
@@ -830,12 +828,13 @@ function activateCityInSidebar(districtId, locationId, cityCoords = null) {
                     
                     marker.on('click', () => { activateCityInSidebar(dist.id, loc.id, null); });
 
-const listItem = document.createElement('li');
-                    listItem.className = 'location-item';
+                    const listItem = document.createElement('li');
                     
-                    // Перевіряємо, чи було це місто відкритим до перемальовування
+                    // Перевіряємо, чи було це місто відкритим перед перемальовуванням списку
                     if (state.activeLocationId === loc.id) {
                         listItem.className = 'location-item active';
+                    } else {
+                        listItem.className = 'location-item';
                     }
                     
                     listItem.innerHTML = `
