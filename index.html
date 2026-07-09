@@ -259,6 +259,27 @@
             padding: 0 2px;
             border-radius: 2px;
         }
+        /* ВИПРАВЛЕННЯ ДЛЯ БЛОКУ ФІЛЬТРАЦІЇ НА МОБІЛЬНИХ */
+@media (max-width: 480px) {
+    .search-filter-box {
+        padding: 0 15px 12px 15px; /* Трохи зменшуємо внутрішні відступи */
+    }
+
+    .search-input {
+        padding: 6px 12px;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .filters-container {
+        font-size: 12px; /* Робимо шрифт чекбоксів трохи меншим, щоб тексти поміщалися в один рядок */
+        gap: 4px;        /* Зменшуємо відстань між чекбоксами */
+    }
+    
+    .filter-label {
+        gap: 6px;        /* Зменшуємо відстань між самим квадратиком чекбокса і текстом */
+    }
+}
     </style>
 </head>
 <body>
