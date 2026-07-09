@@ -228,7 +228,6 @@
         <div id="sidebar">
             <h2 class="sidebar-header">ЗМІ Полтавщини</h2>
             
-            <!-- Панель пошуку та фільтрації -->
             <div class="search-filter-box">
                 <input type="text" id="search-box" class="search-input" placeholder="Пошук міста...">
                 <div class="filters-container">
@@ -259,9 +258,16 @@
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
-        // 2. KML шар
+        // 2. KML шар (з вимкненням стандартних описів при кліку на межі KML)
         try {
-            omnivore.kml('poltava.kml').addTo(map);
+            const kmlLayer = omnivore.kml('poltava.kml').addTo(map);
+            kmlLayer.on('ready', function() {
+                kmlLayer.eachLayer(function(layer) {
+                    if (layer.unbindPopup) {
+                        layer.unbindPopup();
+                    }
+                });
+            });
         } catch(e) { console.log(e); }
 
         // 3. Стан додатку (Фільтри та Пошук)
@@ -428,6 +434,7 @@
     },
     {
         id: "lubensky",
+        name: "Lubensky",
         name: "Лубенський район",
         cities: [
             {
@@ -492,7 +499,7 @@
                     radio: [{ text: "«Люкс фм» Кременчук (вул. Керченська, 37)" }],
                     print: [{ text: "Газета «Для дому і сім’ї» (Шевченко, 50а | редактор Мирослава Українська | <a href='tel:+380507574356'>0507574356</a> | <a href='mailto:gazetakremenchuk@gmail.com'>gazetakremenchuk@gmail.com</a> | тираж 8 500, щочетверга)" }],
                     online: [
-                        { text: "Кременчуцький ТелеграфЪ + drug. (вул. Шевченка, 50-A | редактор Леся Лазоренко | <a href='tel:+380686404448'>0686404448</a> | <a href='mailto:telegraf.in.ua@gmail.com'>telegraf.in.ua@gmail.com</a> | Відвідуваність: 468 000)" },
+                        { text: "Кременчуцький ТелеграфЪ + drug. (вул. Шевченка, 50-A | редактор Леся Лазоренко | <a href='tel:+380686404448'>0686404448</a> | <a href='mailto:telegraf.in.ua@gmail.com'>telegraf.in.ua@gmail.com</a> |  Відвідуваність: 468 000)" },
                         { text: "Кременчуцька газета + drug. (вул. Старшого лейтенанта Кагала, 45 | editor Олег Булашев | <a href='tel:+380675308797'>0675308797</a> | <a href='mailto:advkgua@gmail.com'>advkgua@gmail.com</a> | відвідуваність: 469 000)" },
                         { text: "«Кременчуг тудей» (редактор Василь Сердюк (псевдонім) | <a href='mailto:info@kremen.today'>info@kremen.today</a> | відвідуваність: 169 000)" }
                     ],
@@ -598,7 +605,7 @@
     }
 ];
 
-// 3. Кнопка згортання панелі та жест свайпу (swipe)
+        // 5. Кнопка згортання панелі та жест свайпу (swipe)
         const sidebarContainer = document.getElementById('sidebar-container');
         const toggleBtn = document.getElementById('toggle-btn');
 
@@ -654,7 +661,7 @@
         const locationElements = {};
         const districtsRoot = document.getElementById('districts-root');
 
-        // Функція перевірки: чи є в місті хоча б одне медіа, що підходить під активні фільтри
+        // Функція перевірки: чи є в місті хоча б одне медіа, що підходить под активні фільтри
         function getFilteredContent(city) {
             let html = "";
             let hasData = false;
@@ -705,8 +712,11 @@
                 
                 if (!isLocActive) {
                     locEl.classList.add('active');
-                    if (sidebarContainer.classList.contains('collapsed')) { toggleBtn.click(); }
+                    if (sidebarContainer.classList.contains('collapsed')) { toggleSidebar(false); }
                 }
+                
+                // Прокручуємо сайдбар до активного елемента міста
+                locEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
 
             if (cityCoords) {
@@ -759,8 +769,8 @@
                 filteredCities.forEach(loc => {
                     const popupHtml = getFilteredContent(loc);
 
-                    // Створюємо маркер на карті та додаємо попап
-                    const marker = L.marker(loc.coords).bindPopup(`<h3>${loc.title}</h3>${popupHtml}`);
+                    // Створюємо маркер на карті БЕЗ прив'язки попапу (bindPopup повністю прибрано)
+                    const marker = L.marker(loc.coords);
                     markersGroup.addLayer(marker);
                     
                     marker.on('click', () => { 
@@ -778,7 +788,6 @@
                     listItem.querySelector('.location-trigger').addEventListener('click', (e) => {
                         e.stopPropagation();
                         activateCityInSidebar(dist.id, loc.id, loc.coords);
-                        marker.openPopup();
                     });
 
                     locationListUl.appendChild(listItem);
