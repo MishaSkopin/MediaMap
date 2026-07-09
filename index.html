@@ -96,8 +96,17 @@
             border: none;
             font-size: 14px;
             box-sizing: border-box;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             outline: none;
+        }
+
+        .section-subtitle {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+            opacity: 0.8;
+            font-weight: bold;
         }
 
         .filters-container {
@@ -105,6 +114,7 @@
             flex-direction: column;
             gap: 6px;
             font-size: 13px;
+            margin-bottom: 12px;
         }
 
         .filter-label {
@@ -115,12 +125,27 @@
             user-select: none;
         }
 
+        /* Сортування */
+        .sort-container {
+            font-size: 13px;
+        }
+        .sort-select {
+            width: 100%;
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #0056b3;
+            background-color: #fff;
+            color: #333;
+            outline: none;
+            cursor: pointer;
+        }
+
         .sidebar-scroll-area {
             flex: 1;
             overflow-y: auto;
         }
 
-        /* Стилі для РАЙОНІВ (Рівень 1) */
+        /* Стилі для РАЙОНІВ */
         .district-list {
             list-style: none;
             padding: 0;
@@ -160,7 +185,7 @@
             max-height: 5000px; 
         }
 
-        /* Стилі для МІСТ/ГРОМАД (Рівень 2) */
+        /* Стилі для МІСТ */
         .location-list {
             list-style: none;
             padding: 0;
@@ -198,7 +223,6 @@
             line-height: 1.4;
         }
 
-        /* Активні стани для міст */
         .location-item.active .location-trigger {
             background-color: #e8f0fe;
         }
@@ -218,6 +242,14 @@
         .media-group-title:first-child {
             margin-top: 0;
         }
+        
+        /* Підсвічування тексту при пошуку */
+        .highlight {
+            background-color: #ffeb3b;
+            color: #000;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
     </style>
 </head>
 <body>
@@ -229,13 +261,26 @@
             <h2 class="sidebar-header">ЗМІ Полтавщини</h2>
             
             <div class="search-filter-box">
-                <input type="text" id="search-box" class="search-input" placeholder="Пошук міста...">
+                <!-- Пошуковий рядок по всьому контенту -->
+                <input type="text" id="search-box" class="search-input" placeholder="Шукайте місто, ЗМІ, прізвище, тел...">
+                
+                <!-- Фільтри -->
+                <div class="section-subtitle">Фільтрувати за типом:</div>
                 <div class="filters-container">
                     <label class="filter-label"><input type="checkbox" id="filter-tv" checked> Телебачення</label>
                     <label class="filter-label"><input type="checkbox" id="filter-radio" checked> Радіо</label>
                     <label class="filter-label"><input type="checkbox" id="filter-print" checked> Друковані медіа</label>
                     <label class="filter-label"><input type="checkbox" id="filter-online" checked> Онлайн-медіа</label>
                     <label class="filter-label"><input type="checkbox" id="filter-social" checked> Соціальні мережі</label>
+                </div>
+
+                <!-- Блок сортування -->
+                <div class="section-subtitle">Сортування міст:</div>
+                <div class="sort-container">
+                    <select id="sort-select" class="sort-select">
+                        <option value="alphabet">За алфавітом (А-Я)</option>
+                        <option value="media-count">За кількістю джерел медіа</option>
+                    </select>
                 </div>
             </div>
 
@@ -250,7 +295,6 @@
     <script src="https://unpkg.com/@mapbox/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
 
     <script>
-        // 1. Ініціалізація карти
         const map = L.map('map').setView([49.5, 34.0], 8);
         const markersGroup = L.layerGroup().addTo(map);
 
@@ -258,21 +302,19 @@
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
-        // 2. KML шар (з вимкненням стандартних описів при кліку на межі KML)
         try {
             const kmlLayer = omnivore.kml('poltava.kml').addTo(map);
             kmlLayer.on('ready', function() {
                 kmlLayer.eachLayer(function(layer) {
-                    if (layer.unbindPopup) {
-                        layer.unbindPopup();
-                    }
+                    if (layer.unbindPopup) layer.unbindPopup();
                 });
             });
         } catch(e) { console.log(e); }
 
-        // 3. Стан додатку (Фільтри та Пошук)
+        // Стан додатку з урахуванням сортування
         const state = {
             searchQuery: "",
+            sortBy: "alphabet", // "alphabet" або "media-count"
             filters: {
                 tv: true,
                 radio: true,
@@ -282,7 +324,7 @@
             }
         };
 
-        // 4. Структурована база даних
+        // База даних
         const hierarchyData = [
     {
         id: "poltavsky",
@@ -434,7 +476,6 @@
     },
     {
         id: "lubensky",
-        name: "Lubensky",
         name: "Лубенський район",
         cities: [
             {
@@ -605,99 +646,105 @@
     }
 ];
 
-        // 5. Кнопка згортання панелі та жест свайпу (swipe)
+        // Кнопка згортання та свайп
         const sidebarContainer = document.getElementById('sidebar-container');
         const toggleBtn = document.getElementById('toggle-btn');
 
-        // Функція для перемикання стану сайдбару
         function toggleSidebar(forceCollapse) {
             if (typeof forceCollapse === 'boolean') {
-                if (forceCollapse) {
-                    sidebarContainer.classList.add('collapsed');
-                } else {
-                    sidebarContainer.classList.remove('collapsed');
-                }
+                if (forceCollapse) sidebarContainer.classList.add('collapsed');
+                else sidebarContainer.classList.remove('collapsed');
             } else {
                 sidebarContainer.classList.toggle('collapsed');
             }
             toggleBtn.innerText = sidebarContainer.classList.contains('collapsed') ? '›' : '‹';
         }
 
-        // Клік по кнопці
         toggleBtn.addEventListener('click', toggleSidebar);
 
-        // --- ДОДАВАННЯ ЖЕСТІВ СВАЙПУ ---
         let touchStartX = 0;
         let touchEndX = 0;
-
-        // Фіксуємо координату, де палець торкнувся екрана
-        sidebarContainer.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
-
-        // Фіксуємо координату, де палець відірвався від екрана
-        sidebarContainer.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, { passive: true });
+        sidebarContainer.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+        sidebarContainer.addEventListener('touchend', (e) => { touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, { passive: true });
 
         function handleSwipe() {
             const swipeDistance = touchEndX - touchStartX;
-            const minSwipeDistance = 50; // Мінімальна довжина свайпу в пікселях, щоб уникнути випадкових мікро-рухів
-
-            // Свайп справа наліво (закриваємо сайдбар)
-            if (swipeDistance < -minSwipeDistance) {
-                toggleSidebar(true);
-            }
-            
-            // Свайп зліва направо (відкриваємо сайдбар)
-            if (swipeDistance > minSwipeDistance) {
-                toggleSidebar(false);
-            }
+            if (swipeDistance < -50) toggleSidebar(true);
+            if (swipeDistance > 50) toggleSidebar(false);
         }
 
-        // Елементи інтерфейсу для швидкого доступу
         const districtElements = {};
         const locationElements = {};
         const districtsRoot = document.getElementById('districts-root');
 
-        // Функція перевірки: чи є в місті хоча б одне медіа, що підходить под активні фільтри
-        function getFilteredContent(city) {
+        // Функція підсвічування тексту збігу
+        function highlightText(text, query) {
+            if (!query) return text;
+            const regex = new RegExp(`(${query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        // Функція підрахунку кількості увімкнених медіа для конкретного міста
+        function countActiveMedia(city) {
+            let count = 0;
+            if (state.filters.tv && city.media.tv) count += city.media.tv.length;
+            if (state.filters.radio && city.media.radio) count += city.media.radio.length;
+            if (state.filters.print && city.media.print) count += city.media.print.length;
+            if (state.filters.online && city.media.online) count += city.media.online.length;
+            if (state.filters.social && city.media.social) count += city.media.social.length;
+            return count;
+        }
+
+        // Перевіряє чи є в місті потрібний текст під активними фільтрами
+        function getFilteredContentAndCheckSearch(city, query) {
             let html = "";
             let hasData = false;
+            let queryFound = false;
 
-            if (state.filters.tv && city.media.tv && city.media.tv.length > 0) {
-                html += `<div class="media-group-title"><b>Телебачення:</b></div>`;
-                city.media.tv.forEach(item => html += `• ${item.text}<br>`);
-                hasData = true;
+            // Перевірка назви міста
+            if (query && city.title.toLowerCase().includes(query.toLowerCase())) {
+                queryFound = true;
             }
-            if (state.filters.radio && city.media.radio && city.media.radio.length > 0) {
-                html += `<div class="media-group-title"><b>Радіо:</b></div>`;
-                city.media.radio.forEach(item => html += `• ${item.text}<br>`);
-                hasData = true;
-            }
-            if (state.filters.print && city.media.print && city.media.print.length > 0) {
-                html += `<div class="media-group-title"><b>Друковані медіа:</b></div>`;
-                city.media.print.forEach(item => html += `• ${item.text}<br>`);
-                hasData = true;
-            }
-            if (state.filters.online && city.media.online && city.media.online.length > 0) {
-                html += `<div class="media-group-title"><b>Онлайн-медіа:</b></div>`;
-                city.media.online.forEach(item => html += `• ${item.text}<br>`);
-                hasData = true;
-            }
-            if (state.filters.social && city.media.social && city.media.social.length > 0) {
-                html += `<div class="media-group-title"><b>Соціальні мережі:</b></div>`;
-                city.media.social.forEach(item => {
-                    html += `• <a href="${item.link}" target="_blank">${item.name}</a> (${item.info})<br>`;
+
+            // Допоміжна внутрішня функція обробки медіа блоків
+            function processGroup(items, title) {
+                let groupHtml = "";
+                let groupHasValidItem = false;
+                
+                items.forEach(item => {
+                    const textContent = item.text || `${item.name} ${item.info} ${item.link}`;
+                    const matchesSearch = !query || textContent.toLowerCase().includes(query.toLowerCase());
+                    
+                    if (matchesSearch) {
+                        if (query) queryFound = true;
+                        
+                        if (item.text) {
+                            groupHtml += `• ${highlightText(item.text, query)}<br>`;
+                        } else {
+                            groupHtml += `• <a href="${item.link}" target="_blank">${highlightText(item.name, query)}</a> (${highlightText(item.info, query)})<br>`;
+                        }
+                        groupHasValidItem = true;
+                    }
                 });
-                hasData = true;
+
+                if (groupHasValidItem) {
+                    html += `<div class="media-group-title"><b>${title}:</b></div>` + groupHtml;
+                    hasData = true;
+                }
             }
+
+            if (state.filters.tv && city.media.tv) processGroup(city.media.tv, "Телебачення");
+            if (state.filters.radio && city.media.radio) processGroup(city.media.radio, "Радіо");
+            if (state.filters.print && city.media.print) processGroup(city.media.print, "Друковані медіа");
+            if (state.filters.online && city.media.online) processGroup(city.media.online, "Онлайн-медіа");
+            if (state.filters.social && city.media.social) processGroup(city.media.social, "Соціальні мережі");
+
+            // Якщо є запит, але нічого не знайдено ні в назві міста, ні всередині тексту, повертаємо null
+            if (query && !queryFound) return null;
 
             return hasData ? html : null;
         }
 
-        // Головна функція активації рядка в меню та фокусу карти
         function activateCityInSidebar(districtId, locationId, cityCoords = null) {
             const distEl = districtElements[districtId];
             if (distEl && !distEl.classList.contains('active')) {
@@ -714,8 +761,6 @@
                     locEl.classList.add('active');
                     if (sidebarContainer.classList.contains('collapsed')) { toggleSidebar(false); }
                 }
-                
-                // Прокручуємо сайдбар до активного елемента міста
                 locEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
 
@@ -724,22 +769,32 @@
             }
         }
 
-        // РЕНДЕРИНГ МАРКЕРІВ ТА СПИСКУ
+        // РЕНДЕРИНГ МАРКЕРІВ ТА СПИСКУ З СОРТУВАННЯМ
         function renderDashboard() {
-            // Очищаємо карту від старих маркерів
             markersGroup.clearLayers();
             districtsRoot.innerHTML = "";
 
             hierarchyData.forEach(dist => {
-                // Фільтруємо міста району на основі пошуку та наявності контенту за фільтрами
-                const filteredCities = dist.cities.filter(city => {
-                    const matchesSearch = city.title.toLowerCase().includes(state.searchQuery.toLowerCase());
-                    const hasMediaContent = getFilteredContent(city) !== null;
-                    return matchesSearch && hasMediaContent;
-                });
+                const query = state.searchQuery;
 
-                // Якщо в районі немає міст, які підходять під фільтр/пошук, не виводимо цей район
-                if (filteredCities.length === 0) return;
+                // 1. Формуємо список міст згенерованим контентом, які проходять фільтр пошуку
+                let processedCities = dist.cities.map(city => {
+                    const contentHtml = getFilteredContentAndCheckSearch(city, query);
+                    return {
+                        ...city,
+                        html: contentHtml,
+                        mediaCount: countActiveMedia(city)
+                    };
+                }).filter(city => city.html !== null);
+
+                if (processedCities.length === 0) return;
+
+                // 2. СОРТУВАННЯ МІСТ всередині району
+                if (state.sortBy === "alphabet") {
+                    processedCities.sort((a, b) => a.title.localeCompare(b.title, 'uk'));
+                } else if (state.sortBy === "media-count") {
+                    processedCities.sort((a, b) => b.mediaCount - a.mediaCount);
+                }
 
                 // Створюємо елемент Району
                 const districtLi = document.createElement('li');
@@ -765,11 +820,8 @@
 
                 const locationListUl = districtLi.querySelector('.location-list');
 
-                // Рендеримо тільки відфільтровані міста
-                filteredCities.forEach(loc => {
-                    const popupHtml = getFilteredContent(loc);
-
-                    // Створюємо маркер на карті БЕЗ прив'язки попапу (bindPopup повністю прибрано)
+                // Рендеримо вже відсортовані та відфільтровані міста
+                processedCities.forEach(loc => {
                     const marker = L.marker(loc.coords);
                     markersGroup.addLayer(marker);
                     
@@ -777,12 +829,15 @@
                         activateCityInSidebar(dist.id, loc.id, null); 
                     });
 
-                    // Рядок у меню сайдбару
                     const listItem = document.createElement('li');
                     listItem.className = 'location-item';
+                    
+                    // Відображаємо кількість активних медіа поруч із назвою, якщо увімкнено сортування за кількістю
+                    const badge = state.sortBy === 'media-count' ? ` <small style="color:#777; font-weight:normal;">(${loc.mediaCount})</small>` : '';
+                    
                     listItem.innerHTML = `
-                        <div class="location-trigger"><h4>${loc.title}</h4></div>
-                        <div class="location-content">${popupHtml}</div>
+                        <div class="location-trigger"><h4>${highlightText(loc.title, query)}${badge}</h4></div>
+                        <div class="location-content">${loc.html}</div>
                     `;
 
                     listItem.querySelector('.location-trigger').addEventListener('click', (e) => {
@@ -794,16 +849,21 @@
                     locationElements[loc.id] = listItem;
                 });
 
-                // Якщо пошук активний, автоматично розгортаємо знайдені райони
-                if (state.searchQuery.length > 0) {
+                // Якщо введено пошуковий запит, автоматично розгортаємо райони з результатами
+                if (query.length > 0) {
                     districtLi.classList.add('active');
                 }
             });
         }
 
-        // СЛУХАЧІ ПОДІЙ ІНТЕРФЕЙСУ
+        // СЛУХАЧІ ПОДІЙ
         document.getElementById('search-box').addEventListener('input', (e) => {
             state.searchQuery = e.target.value.trim();
+            renderDashboard();
+        });
+
+        document.getElementById('sort-select').addEventListener('change', (e) => {
+            state.sortBy = e.target.value;
             renderDashboard();
         });
 
@@ -822,7 +882,6 @@
             });
         });
 
-        // Перший запуск додатку
         renderDashboard();
     </script>
 </body>
