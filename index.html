@@ -822,6 +822,9 @@
 
                 const locationListUl = districtLi.querySelector('.location-list');
 
+                // Перевіряємо, чи містить цей район активне наразі місто
+                let containsActiveCity = false;
+
                 processedCities.forEach(loc => {
                     const marker = L.marker(loc.coords);
                     markersGroup.addLayer(marker);
@@ -833,6 +836,7 @@
                     // Перевіряємо, чи було це місто відкритим перед перемальовуванням списку
                     if (state.activeLocationId === loc.id) {
                         listItem.className = 'location-item active';
+                        containsActiveCity = true; // Фіксуємо, що в цьому районі є відкрите місто
                     } else {
                         listItem.className = 'location-item';
                     }
@@ -857,7 +861,8 @@
                     locationElements[loc.id] = listItem;
                 });
 
-                if (query.length > 0) {
+                // Район повинен бути відкритим, якщо введений пошуковий запит АБО якщо всередині є активне місто
+                if (query.length > 0 || containsActiveCity) {
                     districtLi.classList.add('active');
                 }
             });
