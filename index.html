@@ -28,7 +28,7 @@
             z-index: 1;
         }
 
-        /* КАРКАС ПАНЕЛІ */
+   /* КАРКАС ПАНЕЛІ */
         #sidebar-container {
             position: absolute;
             top: 0;
@@ -37,6 +37,7 @@
             display: flex;
             z-index: 2000;
             transition: transform 0.3s ease;
+            touch-action: pan-y; /* ДОДАЙ ЦЕЙ РЯДОК: дозволяє вертикальний скрол браузера, але віддає горизонтальні свайпи нашому JS */
         }
 
         #sidebar-container.collapsed {
@@ -887,42 +888,43 @@
                 renderDashboard();
             });
         });
-// --- ОНОВЛЕНИЙ КОД СВАЙПУ ДЛЯ ВСЬОГО САЙДБАРА ---
+// --- СУПЕР-НАДІЙНИЙ КОД СВАЙПУ ЧЕРЕЗ TOUCHMOVE ---
         let touchStartX = 0;
         let touchStartY = 0;
-        let touchEndX = 0;
-        let touchEndY = 0;
+        let swipeTriggered = false; // Прапорець, щоб жест спрацьовував один раз за дотик
 
         const sidebarContainerEl = document.getElementById('sidebar-container');
 
         sidebarContainerEl.addEventListener('touchstart', (e) => {
             touchStartX = e.changedTouches[0].screenX;
             touchStartY = e.changedTouches[0].screenY;
+            swipeTriggered = false; // Скидаємо прапорець при новому дотику
         }, { passive: true });
 
-        sidebarContainerEl.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            touchEndY = e.changedTouches[0].screenY;
-            handleGlobalSwipe();
-        }, { passive: true });
+        sidebarContainerEl.addEventListener('touchmove', (e) => {
+            if (swipeTriggered) return; // Якщо вже закрили/відкрили під час цього руху — ігноруємо подальший сув
 
-        function handleGlobalSwipe() {
-            const swipeX = touchStartX - touchEndX; // Відстань по горизонталі
-            const swipeY = Math.abs(touchStartY - touchEndY); // Відстань по вертикалі (скрол)
+            const currentX = e.changedTouches[0].screenX;
+            const currentY = e.changedTouches[0].screenY;
+
+            const swipeX = touchStartX - currentX; // Відстань суву по горизонталі
+            const swipeY = Math.abs(touchStartY - currentY); // Відстань по вертикалі
             const isCollapsed = sidebarContainer.classList.contains('collapsed');
 
-            // Перевіряємо, чи рух був переважно по горизонталі, а не по вертикалі (щоб не заважати скролу списку)
-            if (Math.abs(swipeX) > swipeY) { 
-                // Свайп вліво (мінімум на 40px) і сайдбар відкритий -> згортаємо
-                if (swipeX > 40 && !isCollapsed) {
+            // Перевіряємо, чи це чіткий горизонтальний рух (вбік сильніше, ніж вгору/вниз)
+            if (Math.abs(swipeX) > swipeY && Math.abs(swipeX) > 30) {
+                // Свайп вліво (ховаємо сайдбар)
+                if (swipeX > 30 && !isCollapsed) {
                     toggleSidebar(true);
+                    swipeTriggered = true; // Фіксуємо спрацювання
                 } 
-                // Свайп вправо (мінімум на 40px) і сайдбар закритий -> розгортаємо
-                else if (swipeX < -40 && isCollapsed) {
+                // Свайп вправо (показуємо сайдбар)
+                else if (swipeX < -30 && isCollapsed) {
                     toggleSidebar(false);
+                    swipeTriggered = true; // Фіксуємо спрацювання
                 }
             }
-        }
+        }, { passive: true });
         // --- КІНЕЦЬ КОДУ СВАЙПУ ---
         renderDashboard();
     </script>
