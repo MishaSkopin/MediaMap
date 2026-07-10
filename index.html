@@ -887,43 +887,43 @@
                 renderDashboard();
             });
         });
-// --- ТУТ ПОЧИНАЄТЬСЯ КОД СВАЙПУ ДЛЯ МОБІЛЬНИХ ---
+// --- ОНОВЛЕНИЙ КОД СВАЙПУ ДЛЯ ВСЬОГО САЙДБАРА ---
         let touchStartX = 0;
+        let touchStartY = 0;
         let touchEndX = 0;
+        let touchEndY = 0;
 
-        // Вішаємо жест на кнопку-язичок або на верхню частину сайдбара
-        const toggleBtnEl = document.getElementById('toggle-btn');
-        const sidebarHeaderEl = document.querySelector('.sidebar-header');
+        const sidebarContainerEl = document.getElementById('sidebar-container');
 
-        const setupSwipe = (element) => {
-            element.addEventListener('touchstart', (e) => {
-                touchStartX = e.changedTouches[0].screenX;
-            }, { passive: true });
+        sidebarContainerEl.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
 
-            element.addEventListener('touchend', (e) => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipeGesture();
-            }, { passive: true });
-        };
+        sidebarContainerEl.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
+            handleGlobalSwipe();
+        }, { passive: true });
 
-        // Налаштовуємо свайп і для кнопки, і для шапки сайдбара
-        setupSwipe(toggleBtnEl);
-        setupSwipe(sidebarHeaderEl);
-
-        function handleSwipeGesture() {
-            const swipeDistance = touchStartX - touchEndX; // Відстань свайпу вліво
+        function handleGlobalSwipe() {
+            const swipeX = touchStartX - touchEndX; // Відстань по горизонталі
+            const swipeY = Math.abs(touchStartY - touchEndY); // Відстань по вертикалі (скрол)
             const isCollapsed = sidebarContainer.classList.contains('collapsed');
 
-            // Якщо свайпнули вліво більше ніж на 40px і сайдбар відкритий -> закриваємо
-            if (swipeDistance > 40 && !isCollapsed) {
-                toggleSidebar(true);
-            } 
-            // Якщо свайпнули вправо більше ніж на -40px і сайдбар закритий -> відкриваємо
-            else if (swipeDistance < -40 && isCollapsed) {
-                toggleSidebar(false);
+            // Перевіряємо, чи рух був переважно по горизонталі, а не по вертикалі (щоб не заважати скролу списку)
+            if (Math.abs(swipeX) > swipeY) { 
+                // Свайп вліво (мінімум на 40px) і сайдбар відкритий -> згортаємо
+                if (swipeX > 40 && !isCollapsed) {
+                    toggleSidebar(true);
+                } 
+                // Свайп вправо (мінімум на 40px) і сайдбар закритий -> розгортаємо
+                else if (swipeX < -40 && isCollapsed) {
+                    toggleSidebar(false);
+                }
             }
         }
-        // --- ТУТ КОД СВАЙПУ ЗАКІНЧУЄТЬСЯ ---
+        // --- КІНЕЦЬ КОДУ СВАЙПУ ---
         renderDashboard();
     </script>
 </body>
