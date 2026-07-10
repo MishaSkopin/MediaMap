@@ -887,7 +887,45 @@
                 renderDashboard();
             });
         });
+// --- ТУТ ПОЧИНАЄТЬСЯ КОД СВАЙПУ ДЛЯ МОБІЛЬНИХ ---
+        let touchStartX = 0;
+        let touchEndX = 0;
 
+        // Вішаємо жест на кнопку-язичок або на верхню частину сайдбара
+        const toggleBtnEl = document.getElementById('toggle-btn');
+        const sidebarHeaderEl = document.querySelector('.sidebar-header');
+
+        const setupSwipe = (element) => {
+            element.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            element.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipeGesture();
+            }, { passive: true });
+        };
+
+        // Налаштовуємо свайп і для кнопки, і для шапки сайдбара
+        setupSwipe(toggleBtnEl);
+        setupSwipe(sidebarHeaderEl);
+
+        function handleSwipeGesture() {
+            const swipeDistance = touchStartX - touchEndX; // Відстань свайпу вліво
+            const isCollapsed = sidebarContainer.classList.contains('collapsed');
+
+            // Якщо свайпнули вліво більше ніж на 40px і сайдбар відкритий -> закриваємо
+            if (swipeDistance > 40 && !isCollapsed) {
+                toggleSidebar(true);
+            } 
+            // Якщо свайпнули вправо більше ніж на -40px і сайдбар закритий -> відкриваємо
+            else if (swipeDistance < -40 && isCollapsed) {
+                toggleSidebar(false);
+            }
+        }
+        // --- ТУТ КОД СВАЙПУ ЗАКІНЧУЄТЬСЯ ---
+
+        renderDashboard(); // Твій рідний 891 рядок з файлу
         renderDashboard();
     </script>
 </body>
