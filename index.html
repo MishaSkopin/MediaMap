@@ -888,40 +888,41 @@
                 renderDashboard();
             });
         });
-// --- СУПЕР-НАДІЙНИЙ КОД СВАЙПУ ЧЕРЕЗ TOUCHMOVE ---
+        
+
         let touchStartX = 0;
         let touchStartY = 0;
-        let swipeTriggered = false; // Прапорець, щоб жест спрацьовував один раз за дотик
+        let swipeTriggered = false;
 
-        const sidebarContainerEl = document.getElementById('sidebar-container');
-
-        sidebarContainerEl.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-            touchStartY = e.changedTouches[0].screenY;
-            swipeTriggered = false; // Скидаємо прапорець при новому дотику
+        // Слухаємо тачі по всьому вікну браузера
+        window.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].clientX;
+            touchStartY = e.changedTouches[0].clientY;
+            swipeTriggered = false;
         }, { passive: true });
 
-        sidebarContainerEl.addEventListener('touchmove', (e) => {
-            if (swipeTriggered) return; // Якщо вже закрили/відкрили під час цього руху — ігноруємо подальший сув
+        window.addEventListener('touchmove', (e) => {
+            if (swipeTriggered) return;
 
-            const currentX = e.changedTouches[0].screenX;
-            const currentY = e.changedTouches[0].screenY;
+            const currentX = e.changedTouches[0].clientX;
+            const currentY = e.changedTouches[0].clientY;
 
-            const swipeX = touchStartX - currentX; // Відстань суву по горизонталі
-            const swipeY = Math.abs(touchStartY - currentY); // Відстань по вертикалі
+            const swipeX = touchStartX - currentX; // Рух вліво
+            const swipeY = Math.abs(touchStartY - currentY); // Скрол вгору/вниз
             const isCollapsed = sidebarContainer.classList.contains('collapsed');
 
-            // Перевіряємо, чи це чіткий горизонтальний рух (вбік сильніше, ніж вгору/вниз)
+            // 1. Перевіряємо, чи це чіткий горизонтальний жест
             if (Math.abs(swipeX) > swipeY && Math.abs(swipeX) > 30) {
-                // Свайп вліво (ховаємо сайдбар)
-                if (swipeX > 30 && !isCollapsed) {
+                
+                // 2. Якщо сайдбар ВІДКРИТИЙ і користувач свайпає вліво, перебуваючи в зоні сайдбара (перші 350px екрану)
+                if (swipeX > 30 && !isCollapsed && touchStartX < 360) {
                     toggleSidebar(true);
-                    swipeTriggered = true; // Фіксуємо спрацювання
+                    swipeTriggered = true;
                 } 
-                // Свайп вправо (показуємо сайдбар)
-                else if (swipeX < -30 && isCollapsed) {
+                // 3. Якщо сайдбар ЗАКРИТИЙ і користувач свайпає вправо біля лівого краю екрана (до 60px від краю)
+                else if (swipeX < -30 && isCollapsed && touchStartX < 60) {
                     toggleSidebar(false);
-                    swipeTriggered = true; // Фіксуємо спрацювання
+                    swipeTriggered = true;
                 }
             }
         }, { passive: true });
