@@ -28,7 +28,7 @@
             z-index: 1;
         }
 
-   /* КАРКАС ПАНЕЛІ */
+        /* КАРКАС ПАНЕЛІ */
         #sidebar-container {
             position: absolute;
             top: 0;
@@ -37,7 +37,7 @@
             display: flex;
             z-index: 2000;
             transition: transform 0.3s ease;
-            touch-action: pan-y; /* ДОДАЙ ЦЕЙ РЯДОК: дозволяє вертикальний скрол браузера, але віддає горизонтальні свайпи нашому JS */
+            touch-action: pan-y;
         }
 
         #sidebar-container.collapsed {
@@ -128,7 +128,7 @@
             transition: max-height 0.25s ease-out;
         }
         .filters-wrapper.open {
-            max-height: 200px; /* Достатньо для всіх чекбоксів */
+            max-height: 250px;
             margin-top: 8px;
         }
 
@@ -242,7 +242,7 @@
             padding: 15px 20px;
             border-top: 1px solid #e2e8f0;
             overflow-y: auto;
-            transition: none !important; /* Прибираємо анімацію для відкритого стану, щоб не смикалося при кліку на чекбокси */
+            transition: none !important;
         }
 
         .media-group-title {
@@ -308,6 +308,7 @@
                         <label class="filter-label"><input type="checkbox" id="filter-print" checked> Друковані медіа</label>
                         <label class="filter-label"><input type="checkbox" id="filter-online" checked> Онлайн-медіа</label>
                         <label class="filter-label"><input type="checkbox" id="filter-social" checked> Соціальні мережі</label>
+                        <label class="filter-label"><input type="checkbox" id="filter-facebook" checked> Facebook</label>
                     </div>
                 </div>
             </div>
@@ -346,9 +347,10 @@
                 radio: true,
                 print: true,
                 online: true,
-                social: true
+                social: true,
+                facebook: true
             },
-            activeLocationId: null // Зберігаємо ID відкритого міста
+            activeLocationId: null
         };
 
         // База даних
@@ -511,7 +513,12 @@
                 title: "Хорол",
                 media: {
                     tv: [], radio: [], online: [], social: [],
-                    print: [{ text: "Вісті Хорольщини (вул. Незалежності, буд. 65/20, приміщення 1 | <a href='tel:+380950685629'>095 068-56-29</a>, <a href='mailto:horol_visti@ukr.net'>horol_visti@ukr.net</a> | редактор Наталія Ватуля | тираж 8500, щоп’ятниці)" }]
+                    print: [{ text: "Вісті Хорольщини (вул. Незалежності, буд. 65/20, приміщення 1 | <a href='tel:+380950685629'>095 068-56-29</a>, <a href='mailto:horol_visti@ukr.net'>horol_visti@ukr.net</a> | редактор Наталія Ватуля | тираж 8500, щоп’ятниці)" }],
+                    facebook: [
+                        { name: "Хорол - це Україна ✓✓✓", link: "https://www.facebook.com/groups/272584756831023/", info: "20 800 підписників" },
+                        { name: "ХОРОЛ ОГОЛОШЕННЯ", link: "https://www.facebook.com/groups/893873158357112/", info: "10 900 підписників" },
+                        { name: "Підслухано в Хоролі", link: "https://www.facebook.com/groups/547835956320373/", info: "3 200 підписників" }
+                    ]
                 }
             },
             {
@@ -520,7 +527,15 @@
                 title: "Пирятин",
                 media: {
                     tv: [], radio: [], online: [], social: [],
-                    print: [{ text: "Газета «Пирятинські вісті» (вулиця Успенська, 5 | Редактор – Оксана Іванівна Бондаренко, <a href='mailto:pirvisti@ukr.net'>pirvisti@ukr.net</a> | <a href='tel:+380535820673'>(05358) 2-06-73</a>, <a href='tel:+380994556720'>(099) 455-67-20</a> | Тираж 1260, щовівторка)" }]
+                    print: [{ text: "Газета «Пирятинські вісті» (вулиця Успенська, 5 | Редактор – Оксана Іванівна Бондаренко, <a href='mailto:pirvisti@ukr.net'>pirvisti@ukr.net</a> | <a href='tel:+380535820673'>(05358) 2-06-73</a>, <a href='tel:+380994556720'>(099) 455-67-20</a> | Тираж 1260, щовівторка)" }],
+                    facebook: [
+                        { name: "Пирятин", link: "https://www.facebook.com/groups/1436994959890511/", info: "15 200 підписників" },
+                        { name: "Наш Пирятин", link: "https://www.facebook.com/groups/974847270935551/", info: "9 600 підписників" },
+                        { name: "Пирятинські вісті", link: "https://www.facebook.com/groups/1521734621200739/", info: "8 100 підписників" },
+                        { name: "Підслухано Пирятин", link: "https://www.facebook.com/groups/1209245223767428/", info: "4 800 підписників" },
+                        { name: "ПИРЯТИН ОГОЛОШЕННЯ", link: "https://www.facebook.com/groups/779919076660724/", info: "4 800 підписників" },
+                        { name: "Підслухано Пирятин", link: "https://www.facebook.com/groups/408165341723172/", info: "4 000 підписників" }
+                    ]
                 }
             },
             {
@@ -537,6 +552,11 @@
                         { name: "Лубни ЩДК?", link: "https://t.me/lybnygde", info: "6 440 підписників" },
                         { name: "Лубни Тутешні | Світло", link: "https://t.me/lybnusvitlo", info: "4 909 підписників" },
                         { name: "Х Лубни.", link: "https://t.me/lubny_ua", info: "4 095 підписників" }
+                    ],
+                    facebook: [
+                        { name: "Лубни Оголошення", link: "https://www.facebook.com/groups/534915057706999/", info: "55 700 підписників" },
+                        { name: "ЛУБНИ приватнi оголошення", link: "https://www.facebook.com/groups/495049657694750/", info: "48 400 підписників" },
+                        { name: "Підслухано Лубни Official", link: "https://www.facebook.com/groups/pidsluhanolubnyofficial/", info: "45 600 підписників" }
                     ]
                 }
             },
@@ -546,7 +566,53 @@
                 title: "Гребінка",
                 media: {
                     tv: [], radio: [], print: [], social: [],
-                    online: [{ text: "Гребінка (<a href='https://www.grebenka.com/' target='_blank'>https://www.grebenka.com/</a> | <a href='tel:+380663724957'>(066) 372-49-57</a>, <a href='mailto:admin@grebenka.com'>admin@grebenka.com</a> | Відвідуваність 100000)" }]
+                    online: [{ text: "Гребінка (<a href='https://www.grebenka.com/' target='_blank'>https://www.grebenka.com/</a> | <a href='tel:+380663724957'>(066) 372-49-57</a>, <a href='mailto:admin@grebenka.com'>admin@grebenka.com</a> | Відвідуваність 100000)" }],
+                    facebook: [
+                        { name: "Підслухано Гребінка", link: "https://www.facebook.com/groups/244108507932117/", info: "16 300 підписників" },
+                        { name: "ПІДСЛУХАНО ГРЕБІНКИ", link: "https://www.facebook.com/groups/1396679100735875/", info: "15 600 підписників" },
+                        { name: "Гребінка ( Оголошення, Реклама)", link: "https://www.facebook.com/groups/hrebenka/", info: "14 100 підписників" },
+                        { name: "Гребінка online (Полтавщина)", link: "https://www.facebook.com/groups/Hrebinka/", info: "13 500 підписників" },
+                        { name: "Підслухано Гребінка", link: "https://www.facebook.com/groups/211638670553114/", info: "11 900 підписників" },
+                        { name: "ПІДСЛУХАНО ГРЕБІНКА", link: "https://www.facebook.com/groups/1174504833660226/", info: "6 400 підписників" }
+                    ]
+                }
+            },
+            {
+                id: "novoorzhytske",
+                coords: [50.02444512336559, 32.72753492138805],
+                title: "Новооржицьке",
+                media: {
+                    tv: [], radio: [], print: [], online: [], social: [],
+                    facebook: [
+                        { name: "ОгОлОшЕнНя \" Новооржицьке ОТГ\"", link: "https://www.facebook.com/groups/273975460244195/", info: "2 200 підписників" },
+                        { name: "Новооржицьке - цукрова перлина Полтавщини", link: "https://www.facebook.com/groups/Novoorzhytske/", info: "1 400 підписників" }
+                    ]
+                }
+            },
+            {
+                id: "orzhytsia",
+                coords: [49.785506236776925, 32.69673995888506],
+                title: "Оржиця",
+                media: {
+                    tv: [], radio: [], print: [], online: [], social: [],
+                    facebook: [
+                        { name: "Оголошення Оржиця", link: "https://www.facebook.com/groups/598027880811211/", info: "9 900 підписників" },
+                        { name: "Підслухано в Оржиці", link: "https://www.facebook.com/groups/272894033248392/", info: "9 400 підписників" },
+                        { name: "оржицька селищна рада", link: "https://www.facebook.com/groups/824668054845346/", info: "1 800 підписників" }
+                    ]
+                }
+            },
+            {
+                id: "chornukhy",
+                coords: [50.27426810287637, 32.93603535429706],
+                title: "Чорнухи",
+                media: {
+                    tv: [], radio: [], print: [], online: [], social: [],
+                    facebook: [
+                        { name: "ДОШКА ОГОЛОШЕНЬ ЧОРНУХИ", link: "https://www.facebook.com/groups/351128642233232/", info: "11 500 підписників" },
+                        { name: "Чорнухинське земляцтво", link: "https://www.facebook.com/groups/chornukhy/", info: "6 500 підписників" },
+                        { name: "Це все Чорнухи", link: "https://www.facebook.com/groups/1369652697062887/", info: "3 200 підписників" }
+                    ]
                 }
             }
         ]
@@ -754,6 +820,7 @@
             if (state.filters.print && city.media.print) processGroup(city.media.print, "Друковані медіа");
             if (state.filters.online && city.media.online) processGroup(city.media.online, "Онлайн-медіа");
             if (state.filters.social && city.media.social) processGroup(city.media.social, "Соціальні мережі");
+            if (state.filters.facebook && city.media.facebook) processGroup(city.media.facebook, "Facebook");
 
             if (query && !queryFound) return null;
 
@@ -761,7 +828,7 @@
         }
 
         function activateCityInSidebar(districtId, locationId, cityCoords = null) {
-            state.activeLocationId = locationId; // Запам'ятовуємо, яке місто відкрили
+            state.activeLocationId = locationId;
 
             const distEl = districtElements[districtId];
             if (distEl && !distEl.classList.contains('active')) {
@@ -823,7 +890,6 @@
 
                 const locationListUl = districtLi.querySelector('.location-list');
 
-                // Перевіряємо, чи містить цей район активне наразі місто
                 let containsActiveCity = false;
 
                 processedCities.forEach(loc => {
@@ -834,10 +900,9 @@
 
                     const listItem = document.createElement('li');
                     
-                    // Перевіряємо, чи було це місто відкритим перед перемальовуванням списку
                     if (state.activeLocationId === loc.id) {
                         listItem.className = 'location-item active';
-                        containsActiveCity = true; // Фіксуємо, що в цьому районі є відкрите місто
+                        containsActiveCity = true;
                     } else {
                         listItem.className = 'location-item';
                     }
@@ -849,7 +914,6 @@
 
                     listItem.querySelector('.location-trigger').addEventListener('click', (e) => {
                         e.stopPropagation();
-                        // Якщо клікнули на вже відкрите місто — згортаємо його
                         if (state.activeLocationId === loc.id) {
                             state.activeLocationId = null;
                             listItem.classList.remove('active');
@@ -862,7 +926,6 @@
                     locationElements[loc.id] = listItem;
                 });
 
-                // Район повинен бути відкритим, якщо введений пошуковий запит АБО якщо всередині є активне місто
                 if (query.length > 0 || containsActiveCity) {
                     districtLi.classList.add('active');
                 }
@@ -879,7 +942,8 @@
             radio: 'filter-radio',
             print: 'filter-print',
             online: 'filter-online',
-            social: 'filter-social'
+            social: 'filter-social',
+            facebook: 'filter-facebook'
         };
 
         Object.keys(filterIds).forEach(key => {
@@ -894,7 +958,6 @@
         let touchStartY = 0;
         let swipeTriggered = false;
 
-        // Слухаємо тачі по всьому вікну браузера
         window.addEventListener('touchstart', (e) => {
             touchStartX = e.changedTouches[0].clientX;
             touchStartY = e.changedTouches[0].clientY;
@@ -907,26 +970,22 @@
             const currentX = e.changedTouches[0].clientX;
             const currentY = e.changedTouches[0].clientY;
 
-            const swipeX = touchStartX - currentX; // Рух вліво
-            const swipeY = Math.abs(touchStartY - currentY); // Скрол вгору/вниз
+            const swipeX = touchStartX - currentX;
+            const swipeY = Math.abs(touchStartY - currentY);
             const isCollapsed = sidebarContainer.classList.contains('collapsed');
 
-            // 1. Перевіряємо, чи це чіткий горизонтальний жест
             if (Math.abs(swipeX) > swipeY && Math.abs(swipeX) > 30) {
-                
-                // 2. Якщо сайдбар ВІДКРИТИЙ і користувач свайпає вліво, перебуваючи в зоні сайдбара (перші 350px екрану)
                 if (swipeX > 30 && !isCollapsed && touchStartX < 360) {
                     toggleSidebar(true);
                     swipeTriggered = true;
                 } 
-                // 3. Якщо сайдбар ЗАКРИТИЙ і користувач свайпає вправо біля лівого краю екрана (до 60px від краю)
                 else if (swipeX < -30 && isCollapsed && touchStartX < 60) {
                     toggleSidebar(false);
                     swipeTriggered = true;
                 }
             }
         }, { passive: true });
-        // --- КІНЕЦЬ КОДУ СВАЙПУ ---
+
         renderDashboard();
     </script>
 </body>
